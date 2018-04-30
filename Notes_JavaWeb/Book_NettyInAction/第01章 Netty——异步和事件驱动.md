@@ -1,5 +1,4 @@
-图片实例
+![](assets/avator.png)
 
-![](第01章 Netty——异步和事件驱动.assets/avator.png)
+这样感觉更好一点
 
-看看胸部行
