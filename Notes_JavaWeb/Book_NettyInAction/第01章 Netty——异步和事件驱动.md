@@ -90,17 +90,16 @@ ChannelFuture future = channel.connect( // 异步地连接到远程节点
     new InetSocketAddress("192.168.0.1", 25));
 future.addListener(new ChannelFutureListener() { // 注册一个ChannelFutureListener，以便在操作完成时获得通知
     @Override
-    public void operationComplete(ChannelFuture future) { // 检查操作
-的状态
+    public void operationComplete(ChannelFuture future) { // 检查操作的状态
        if (future.isSuccess()){ 
-            ByteBuf buffer = Unpooled.copiedBuffer( // 如果操作是成功的，
-               "Hello",Charset.defaultCharset()); // 则创建一个ByteBuf以持有数据
+            ByteBuf buffer = Unpooled.copiedBuffer( // 如果操作是成功的，则创建一个ByteBuf以持有数据
+               "Hello",Charset.defaultCharset()); 
            ChannelFuture wf = future.channel()
-                .writeAndFlush(buffer); // 将数据异步地发送到远程节点。
-            ....											// 返回一个ChannelFuture
+                .writeAndFlush(buffer); // 将数据异步地发送到远程节点。返回一个ChannelFuture
+            .... 
         } else {
-            Throwable cause = future.cause(); // 如果发生错误，
-            cause.printStackTrace(); // 则访问描述原因的Throwable
+            Throwable cause = future.cause(); // 如果发生错误，则访问描述原因的Throwable
+            cause.printStackTrace();
         }
     }
 });
