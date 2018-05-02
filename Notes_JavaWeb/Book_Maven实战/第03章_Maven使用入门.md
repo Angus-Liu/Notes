@@ -33,9 +33,11 @@ Maven项目的核心是pom.xml。POM（Project Object Model，项目对象模型
 
 ### 3.2 编写主代码
 
-项目主代码和测试代码不同，项目的主代码会被打包到最终的**构件**中（如jar），而测试代码只在运行测试时用到，不会被打包。默认情况下，Maven假设项目主代码位于`src/main/java`目录中。
+项目主代码和测试代码不同，项目的主代码会被打包到最终的**构件**中（如jar），而测试代码只在运行测试时用到，不会被打包。默认情况下，Maven假设项目主代码位于**`src/main/java`**目录中，Maven会自动搜寻该目录找到项目主代码。
 
 ```java
+// 该Java类的包名是com.juvenxu.mvnbook.helloworld，
+// 这与之前在POM中定义的groupId和artifactId相吻合
 package com.angus.mvnbook.helloworld;
 
 public class HelloWorld {
