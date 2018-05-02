@@ -2,7 +2,7 @@
 
 Maven项目的核心是pom.xml。POM（Project Object Model，项目对象模型）定义了项目的基本信息，用于描述项目如何构建，声明项目依赖，等等。
 
-​	手续爱你
+  首先创建一个名为hello-world的文件夹，打开该文件夹，新建一个名为pom.xml的文件，输入其内容：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -18,3 +18,4 @@ Maven项目的核心是pom.xml。POM（Project Object Model，项目对象模型
 
 </project>
 ```
+
