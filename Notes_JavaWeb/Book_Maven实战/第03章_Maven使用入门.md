@@ -55,7 +55,7 @@ public class HelloWorld {
 }
 ```
 
-代码编写完毕后，使用Maven进行编译，在项目根目录下运行命令mvn clean compile。
+代码编写完毕后，使用Maven进行编译，在项目根目录下运行命令mvn clean compile：
 
 ```shell
 # clean告诉Maven清理输出目录target/，compile告诉Maven编译项目主代码
@@ -93,7 +93,7 @@ $ mvn clean compile
 
 Maven项目中默认的测试代码目录是src/test/java。
 
-在Java世界中，由Kent Beck和Erich Gamma建立的JUnit是事实上的单元测试标准。要使用JUnit，首先需要为Hello World项目添加一个JUnit依赖。
+在Java世界中，由Kent Beck和Erich Gamma建立的JUnit是事实上的单元测试标准。要使用JUnit，首先需要为Hello World项目添加一个JUnit依赖：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -107,20 +107,102 @@ Maven项目中默认的测试代码目录是src/test/java。
     <version>1.0-SNAPSHOT</version>
     <name>Maven Hello World Project</name>
 
+    <!-- dependencies元素下可以包含多个dependency元素以声明项目的依赖 -->
     <dependencies>
-	    <!-- https://mvnrepository.com/artifact/junit/junit -->
-		<dependency>
-		    <groupId>junit</groupId>
-		    <artifactId>junit</artifactId>
-		    <version>4.12</version>
-		    <scope>test</scope>
-		</dependency>
-	</dependencies>
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <!-- 有了groupId和artifactId以及version，Maven就能够自动下载junit-4.12jar。 -->
+            <!-- Maven会自动访问中央仓库（http://repo1.maven.org/maven2/），下载需要的文件 -->
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <!-- scope为依赖范围，若依赖范围为test则表示该依赖只对测试有效 -->
+            <!-- 测试代码中的import JUnit代码是没有问题的，但是如果在主代码中用import JUnit代码，
+                 就会造成编译错误。如果不声明依赖范围，那么默认值就是compile，表示该依赖对主代码和测试代码都有效 -->
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>
 ```
 
+在src/test/java目录下创建创建测试类：
 
+```java
+package com.angus.mvnbook.helloworld;
+
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+public class HelloWorldTest {
+    @Test
+    public void testSayHello() {
+        HelloWorld helloWorld = new HelloWorld();
+        String result = helloWorld.sayHello();
+        assertEquals("Hello Maven!", result);
+    }
+}
+```
+
+一个典型的单元测试包含三个步骤：
+
+① 准备测试类
+
+ 
+
+调用Maven执行测试，运行mvn clean test：
+
+```shel
+$ mvn clean test
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ----------------------< com.angus.maven:maven01 >-----------------------
+[INFO] Building maven01 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ maven01 ---
+[INFO] Deleting E:\Temp\Maven_Demo\maven01\target
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ maven01 ---
+[WARNING] Using platform encoding (GBK actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory E:\Temp\Maven_Demo\maven01\src\main\resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ maven01 ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding GBK, i.e. build is platform dependent!
+[INFO] Compiling 1 source file to E:\Temp\Maven_Demo\maven01\target\classes
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ maven01 ---
+[WARNING] Using platform encoding (GBK actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory E:\Temp\Maven_Demo\maven01\src\test\resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ maven01 ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding GBK, i.e. build is platform dependent!
+[INFO] Compiling 1 source file to E:\Temp\Maven_Demo\maven01\target\test-classes
+[INFO]
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ maven01 ---
+[INFO] Surefire report directory: E:\Temp\Maven_Demo\maven01\target\surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running com.angus.maven.HelloWorldTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.114 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 4.257 s
+[INFO] Finished at: 2018-05-02T17:49:23+08:00
+[INFO] ------------------------------------------------------------------------
+
+
+```
 
 
 
