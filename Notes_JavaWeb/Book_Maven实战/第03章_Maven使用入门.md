@@ -10,23 +10,26 @@ Maven项目的核心是pom.xml。POM（Project Object Model，项目对象模型
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<!-- modelVersion元素指定当前POM模型的版本，只能是4.0.0 -->
-  	<modelVersion>4.0.0</modelVersion>
+    <!-- modelVersion元素指定当前POM模型的版本，只能是4.0.0 -->
+    <modelVersion>4.0.0</modelVersion>
 
-	<!-- groupId、artifactId和version三行是pom.xml中最重要的 -->
-	<!-- groupId定义了项目属于哪个组（组织或公司），
-	     譬如在googlecode上建立了一个名为myapp的项目，
-	     那么groupId就应该是com.googlecode.myapp -->
-	<groupId>com.angus.mvnbook</groupId>
-	<!-- artifactId定义了当前Maven项目在组中的唯一ID，
-	     在前面的groupId为com.googlecode.myapp的例子中，
-	     可能会为不同的子项目（模块）分配artifactId，如my-app-util、myapp-domain、myapp-web等 -->
-	<artifactId>hello-world</artifactId>
-	<!-- version指定了项目当前的版本 —— 1.0-SNAPSHOT，
-	     SNAPSHOT意为快照，说明该项目还处于开发中，是不稳定的版本。-->
-	<version>1.0-SNAPSHOT</version>
-	<!-- name元素声明了一个对于用户更友好的名称，非必须，但建议设置 -->
-	<name>Maven Hello World Project</name>
+    <!-- groupId、artifactId和version三行是pom.xml中最重要的 -->
+    <!-- groupId定义了项目属于哪个组（组织或公司），
+         譬如在googlecode上建立了一个名为myapp的项目，
+         那么groupId就应该是com.googlecode.myapp -->
+    <groupId>com.angus.mvnbook</groupId>
+    
+    <!-- artifactId定义了当前Maven项目在组中的唯一ID，
+         在前面的groupId为com.googlecode.myapp的例子中，
+         可能会为不同的子项目（模块）分配artifactId，如my-app-util、myapp-domain、myapp-web等 -->
+    <artifactId>hello-world</artifactId>
+    
+    <!-- version指定了项目当前的版本 —— 1.0-SNAPSHOT，
+         SNAPSHOT意为快照，说明该项目还处于开发中，是不稳定的版本。-->
+    <version>1.0-SNAPSHOT</version>
+    
+    <!-- name元素声明了一个对于用户更友好的名称，非必须，但建议设置 -->
+    <name>Maven Hello World Project</name>
 
 </project>
 ```
