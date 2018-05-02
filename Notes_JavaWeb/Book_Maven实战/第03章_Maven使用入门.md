@@ -57,7 +57,7 @@ public class HelloWorld {
 
 代码编写完毕后，使用Maven进行编译，在项目根目录下运行命令mvn clean compile：
 
-```shell
+```bash
 # clean告诉Maven清理输出目录target/，compile告诉Maven编译项目主代码
 $ mvn clean compile
 [INFO] Scanning for projects...
@@ -144,42 +144,21 @@ public class HelloWorldTest {
 }
 ```
 
-一个典型的**单元测试**包含三个步骤：
-① 准备测试类及数据；
-② 执行要测试的行为；
-③ 检查结果。
+一个典型的**单元测试**包含三个步骤：① 准备测试类及数据；② 执行要测试的行为；③ 检查结果。
 
 调用Maven执行测试，运行mvn clean test：
 
-```shel
+```bash
 $ mvn clean test
-[INFO] Scanning for projects...
-[INFO]
-[INFO] ----------------------< com.angus.maven:maven01 >-----------------------
-[INFO] Building maven01 1.0.0-SNAPSHOT
-[INFO] --------------------------------[ jar ]---------------------------------
-[INFO]
-[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ maven01 ---
-[INFO] Deleting E:\Temp\Maven_Demo\maven01\target
-[INFO]
-[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ maven01 ---
-[WARNING] Using platform encoding (GBK actually) to copy filtered resources, i.e. build is platform dependent!
-[INFO] skip non existing resourceDirectory E:\Temp\Maven_Demo\maven01\src\main\resources
-[INFO]
-[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ maven01 ---
-[INFO] Changes detected - recompiling the module!
-[WARNING] File encoding has not been set, using platform encoding GBK, i.e. build is platform dependent!
-[INFO] Compiling 1 source file to E:\Temp\Maven_Demo\maven01\target\classes
-[INFO]
-[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ maven01 ---
-[WARNING] Using platform encoding (GBK actually) to copy filtered resources, i.e. build is platform dependent!
-[INFO] skip non existing resourceDirectory E:\Temp\Maven_Demo\maven01\src\test\resources
-[INFO]
+...
+# maven-compiler-plugin:3.1:testCompile任务执行完成，测试代码通过编译之后在target/test-classes下生成了二进制文件
 [INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ maven01 ---
 [INFO] Changes detected - recompiling the module!
 [WARNING] File encoding has not been set, using platform encoding GBK, i.e. build is platform dependent!
 [INFO] Compiling 1 source file to E:\Temp\Maven_Demo\maven01\target\test-classes
 [INFO]
+# maven-surefire-plugin:2.12.4:test任务运行测试，surefire是Maven中负责执行测试的插件，
+# 这里它运行测试用例HelloWorldTest，并且输出测试报告，显示一共运行了多少测试，失败了多少，出错了多少，跳过了多少
 [INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ maven01 ---
 [INFO] Surefire report directory: E:\Temp\Maven_Demo\maven01\target\surefire-reports
 
@@ -199,11 +178,26 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Total time: 4.257 s
 [INFO] Finished at: 2018-05-02T17:49:23+08:00
 [INFO] ------------------------------------------------------------------------
-
-
 ```
 
+### 3.4 打包和运行
 
+将项目进行编译、测试之后，下一个重要步骤就是打包（package）。Hello World的POM中没有指定打包类型，使用默认打包类型jar。简单地执行命令mvn clean package进行打包：
+
+```shell
+$ mvn clean package
+...
+[INFO]
+# maven-jar-plugin:2.4:jar 任务负责打包
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ maven01 ---
+[INFO] Building jar: E:\Temp\Maven_Demo\maven01\target\maven01-1.0.0-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 5.082 s
+[INFO] Finished at: 2018-05-02T18:13:44+08:00
+[INFO] ------------------------------------------------------------------------
+```
 
 
 
