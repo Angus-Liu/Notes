@@ -14,6 +14,7 @@ Maven项目的核心是pom.xml。POM（Project Object Model，项目对象模型
     <modelVersion>4.0.0</modelVersion>
 
     <!-- groupId、artifactId和version三行是pom.xml中最重要的 -->
+    
     <!-- groupId定义了项目属于哪个组（组织或公司），
          譬如在googlecode上建立了一个名为myapp的项目，
          那么groupId就应该是com.googlecode.myapp -->
@@ -39,8 +40,8 @@ Maven项目的核心是pom.xml。POM（Project Object Model，项目对象模型
 项目主代码和测试代码不同，项目的主代码会被打包到最终的**构件**中（如jar），而测试代码只在运行测试时用到，不会被打包。默认情况下，Maven假设项目主代码位于`src/main/java`目录中，Maven会自动搜寻该目录找到项目主代码。
 
 ```java
-// 该Java类的包名是com.juvenxu.mvnbook.helloworld，
-// 这与之前在POM中定义的groupId和artifactId相吻合
+// 该Java类的包名是com.juvenxu.mvnbook.helloworld，这与之前在POM中定义的groupId和artifactId相吻合
+// 项目中Java类的包都应该基于项目的groupId和artifactId，这样更加清晰，更加符合逻辑，也方便搜索构件或者Java类
 package com.angus.mvnbook.helloworld;
 
 public class HelloWorld {
@@ -52,5 +53,36 @@ public class HelloWorld {
         System.out.println(new HelloWorld().sayHello());
     }
 }
+```
+
+代码编写完毕后，使用Maven进行编译，在项目根目录下运行命令mvn clean compile。
+
+```
+
+$ mvn clean compile
+[INFO] Scanning for projects...
+[INFO]
+[INFO] -------------------< com.angus.mvnbook:hello-world >--------------------
+[INFO] Building Maven Hello World Project 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ hello-world ---
+[INFO] Deleting E:\Temp\helloworld\target
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ hello-world ---
+[WARNING] Using platform encoding (GBK actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory E:\Temp\helloworld\src\main\resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ hello-world ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding GBK, i.e. build is platform dependent!
+[INFO] Compiling 1 source file to E:\Temp\helloworld\target\classes
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.199 s
+[INFO] Finished at: 2018-05-02T10:38:11+08:00
+[INFO] ------------------------------------------------------------------------
+
 ```
 
