@@ -146,9 +146,9 @@ public class HelloWorldTest {
 
 一个典型的单元测试包含三个步骤：
 
-① 准备测试类
+① 准备测试类  
 
- 
+
 
 调用Maven执行测试，运行mvn clean test：
 
