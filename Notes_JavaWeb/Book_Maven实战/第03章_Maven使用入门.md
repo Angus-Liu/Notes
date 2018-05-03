@@ -152,21 +152,21 @@ public class HelloWorldTest {
 $ mvn clean test
 ...
 # maven-compiler-plugin:3.1:testCompile任务执行完成，测试代码通过编译之后在target/test-classes下生成了二进制文件
-[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ maven01 ---
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ hello-world ---
 [INFO] Changes detected - recompiling the module!
 [WARNING] File encoding has not been set, using platform encoding GBK, i.e. build is platform dependent!
-[INFO] Compiling 1 source file to E:\Temp\Maven_Demo\maven01\target\test-classes
+[INFO] Compiling 1 source file to E:\Temp\helloworld\target\test-classes
 [INFO]
 # maven-surefire-plugin:2.12.4:test任务运行测试，surefire是Maven中负责执行测试的插件，
 # 这里它运行测试用例HelloWorldTest，并且输出测试报告，显示一共运行了多少测试，失败了多少，出错了多少，跳过了多少
-[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ maven01 ---
-[INFO] Surefire report directory: E:\Temp\Maven_Demo\maven01\target\surefire-reports
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ hello-world ---
+[INFO] Surefire report directory: E:\Temp\helloworld\target\surefire-reports
 
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
-Running com.angus.maven.HelloWorldTest
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.114 sec
+Running com.angus.mvnbook.helloworld.HelloWorldTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.131 sec
 
 Results :
 
@@ -175,9 +175,11 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 4.257 s
-[INFO] Finished at: 2018-05-02T17:49:23+08:00
+[INFO] Total time: 6.251 s
+[INFO] Finished at: 2018-05-03T08:53:54+08:00
 [INFO] ------------------------------------------------------------------------
+
+
 ```
 
 ### 3.4 打包和运行
@@ -189,15 +191,108 @@ $ mvn clean package
 ...
 [INFO]
 # maven-jar-plugin:2.4:jar 任务负责打包
-[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ maven01 ---
-[INFO] Building jar: E:\Temp\Maven_Demo\maven01\target\maven01-1.0.0-SNAPSHOT.jar
+# jar插件将项目主代码打包成一个名为hello-world-1.0-SNAPSHOT.jar的文件
+# 该文件是根据artifactId-version.jar命名的（可以使用fileName来自定义文件名称）
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ hello-world ---
+[INFO] Building jar: E:\Temp\helloworld\target\hello-world-1.0-SNAPSHOT.jar
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 5.082 s
-[INFO] Finished at: 2018-05-02T18:13:44+08:00
+[INFO] Total time: 6.497 s
+[INFO] Finished at: 2018-05-03T08:55:24+08:00
 [INFO] ------------------------------------------------------------------------
 ```
+
+执行mvn clean install命令，将构件安装到本地仓库，使得其他Maven项目可以直接使用该构件：
+
+```shell
+$ mvn clean install
+...
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ hello-world ---
+[INFO] Building jar: E:\Temp\helloworld\target\hello-world-1.0-SNAPSHOT.jar
+[INFO]
+# 执行maven-install-plugin:2.4:install任务，将项目输出的jar安装到本地仓库
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ hello-world ---
+[INFO] Installing E:\Temp\helloworld\target\hello-world-1.0-SNAPSHOT.jar to C:\Users\GuangSIR\.m2\repository\com\angus\mvnbook\hello-world\1.0-SNAPSHOT\hello-world-1.0-SNAPSHOT.jar
+[INFO] Installing E:\Temp\helloworld\pom.xml to C:\Users\GuangSIR\.m2\repository\com\angus\mvnbook\hello-world\1.0-SNAPSHOT\hello-world-1.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 7.076 s
+[INFO] Finished at: 2018-05-03T09:00:58+08:00
+[INFO] ------------------------------------------------------------------------
+
+
+```
+
+借助插件maven-shade-plugin可构建带有Main-Class信息的可运行jar：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.angus.mvnbook</groupId>
+    <artifactId>hello-world</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>Maven Hello World Project</name>
+
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.angus.mvnbook.helloworld.HelloWorld</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+执行java -jar命令执行该jar文件：
+
+```shell
+$ java -jar hello-world-1.0-SNAPSHOT.jar
+Hello Maven!
+```
+
+### 3.5 使用Archetype生成项目骨架
+
+若是Maven 3，简单地运行下列命令可帮助生成项目骨架：
+
+```shell
+mvn archetype:generate
+```
+
+
 
 
 
