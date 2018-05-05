@@ -2,9 +2,9 @@
 
 > 记录学习**Netty**的历程，参考自书籍[《Netty In Action（Netty实战）》](https://book.douban.com/subject/27038538/)
 >
-> 下载链接：<http://readfree.me/book/27038538/>
+> 下载链接：<http://readfree.me/book/27038538/> 
 
-![img](assets/s29444565.jpg) 
+![img](assets/s28361212.jpg) 
 
 ## 目录
 
