@@ -71,9 +71,11 @@
 
 23. **子类或子类方法实现    Ctrl + Alt + B**
 
-24. 运行当前代码   Ctrl + Shift + F10
+24. 查看继承关系  Ctrl + H
 
-25. IntelliJ IDEA生成foreach或者loop的快捷键 
+25. 运行当前代码   Ctrl + Shift + F10
+
+26. IntelliJ IDEA生成foreach或者loop的快捷键 
 
     ```java
     iter    Iterate (for each..in)   
@@ -142,6 +144,7 @@
 2. 隐藏显示工具栏    Ctrl + Alt + x
 3. 切换任务+新建桌面    Win + TAB
 4. 软件跑到屏幕外    ALT＋TAB 后 ALT＋空格
+5. 窗口快捷操作  Alt + 空格 + 其他选项（最大化，最小化，还原。。。）
 
 # Linux 篇
 
