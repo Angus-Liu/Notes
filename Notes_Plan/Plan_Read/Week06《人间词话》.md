@@ -8,4 +8,4 @@ Week06《人间词话》
 
 下载链接（我的百度网盘）：https://pan.baidu.com/s/1WVAefdGMB-LoTQ5RsOFtVQ 密码：403d
 
-![1525564153123](assets/1525564153123.png)
+![img](assets/s11196051.jpg) 
