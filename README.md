@@ -1,6 +1,6 @@
-> 早点儿折腾，在最有承受能力的时候冲出去！
+> ### 早点儿折腾，在最有承受能力的时候冲出去！
 >
-> Fear can hold you prisoner,hope can set you free.
+> **Fear can hold you prisoner,hope can set you free.**
 >
 > A strong man can save himself,a great man can save another. 
 
