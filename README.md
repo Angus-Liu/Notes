@@ -1,6 +1,8 @@
 > 早点儿折腾，在最有承受能力的时候冲出去！
 >
-> Stay hungry, Stay foolish.
+> Fear can hold you prisoner,hope can set you free.
+>
+> A strong man can save himself,a great man can save another.   
 
 + [**Notes_AlgorithmTraining**](Notes_AlgorithmTraining)
   + [Training_LeetCode](Notes_AlgorithmTraining/Training_LeetCode)
