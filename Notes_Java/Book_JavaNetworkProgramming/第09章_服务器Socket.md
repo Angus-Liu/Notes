@@ -823,9 +823,7 @@ public class RequestProcessor implements Runnable {
         }
     }
 
-    private void sendHeader(Writer out, String responseCode,
-                            String contentType, int length)
-            throws IOException {
+    private void sendHeader(Writer out, String responseCode, String contentType, int length) throws IOException {
         out.write(responseCode + "\r\n");
         Date now = new Date();
         out.write("Date: " + now + "\r\n");
