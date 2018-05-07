@@ -292,3 +292,216 @@ public class EchoServer {
 }
 ```
 
+## 构造服务器Socket
+
+有4个公共的ServerSocket构造函数：
+
+```java
+public ServerSocket(int port) throws BindException, IOException
+public ServerSocket(int port, int queueLength) throws BindException, IOException
+public ServerSocket(int port, int queueLength, InetAddress bindAddress) throws IOException
+public ServerSocket() throws IOException
+```
+
+这些构造函数可以指定端口、保存入站连接请求所用的队列长度，以及要绑定的本地网络接口。
+
+```java
+// 查找本地端口
+import java.io.*;
+import java.net.*;
+
+public class LocalPortScanner {
+
+    public static void main(String[] args) {
+
+        for (int port = 1; port <= 65535; port++) {
+            try {
+                // 如果这个端口上已经有服务器在运行，就会抛出异常
+                ServerSocket server = new ServerSocket(port);
+            } catch (IOException ex) {
+                System.out.println("There is a server on port " + port + ".");
+            }
+        }
+    }
+}
+```
+
+## 获得服务器Socket的有关信息
+
+```java
+// 随机端口
+import java.io.*;
+import java.net.*;
+
+public class RandomPort {
+
+    public static void main(String[] args) {
+        try {
+            // 构造ServerSocket时，为其端口参数传入，系统会自动分配一个未占用的端口
+            ServerSocket server = new ServerSocket(0); 
+            System.out.println("This server runs on port "
+                    + server.getLocalPort()); // 未绑定端口时，返回-1
+        } catch (IOException ex) {
+            System.err.println(ex);
+        }
+    }
+}
+```
+
+## HTTP服务器
+
+### 单文件服务器
+
+```java
+// 提供单一文件的HTTP服务器
+import java.io.*;
+import java.net.*;
+import java.nio.charset.Charset;
+import java.nio.file.*;
+import java.util.concurrent.*;
+import java.util.logging.*;
+
+public class SingleFileHTTPServer {
+
+    private static final Logger logger = Logger.getLogger("SingleFileHTTPServer");
+
+    private final byte[] content;
+    private final byte[] header;
+    private final int port;
+    private final String encoding;
+
+    public SingleFileHTTPServer(String data, String encoding,
+                                String mimeType, int port) throws UnsupportedEncodingException {
+        this(data.getBytes(encoding), encoding, mimeType, port);
+    }
+
+    public SingleFileHTTPServer(
+            byte[] data, String encoding, String mimeType, int port) {
+        this.content = data;
+        this.port = port;
+        this.encoding = encoding;
+        String header = "HTTP/1.0 200 OK\r\n"
+                + "Server: OneFile 2.0\r\n"
+                + "Content-length: " + this.content.length + "\r\n"
+                + "Content-type: " + mimeType + "; charset=" + encoding + "\r\n\r\n";
+        this.header = header.getBytes(Charset.forName("US-ASCII"));
+    }
+
+    public void start() {
+        ExecutorService pool = Executors.newFixedThreadPool(100);
+        try (ServerSocket server = new ServerSocket(this.port)) {
+            logger.info("Accepting connections on port " + server.getLocalPort());
+            logger.info("Data to be sent:");
+            logger.info(new String(this.content, encoding));
+
+            while (true) {
+                try {
+                    Socket connection = server.accept();
+                    pool.submit(new HTTPHandler(connection));
+                } catch (IOException ex) {
+                    logger.log(Level.WARNING, "Exception accepting connection", ex);
+                } catch (RuntimeException ex) {
+                    logger.log(Level.SEVERE, "Unexpected error", ex);
+                }
+            }
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "Could not start server", ex);
+        }
+    }
+
+    private class HTTPHandler implements Callable<Void> {
+        private final Socket connection;
+
+        HTTPHandler(Socket connection) {
+            this.connection = connection;
+        }
+
+        @Override
+        public Void call() throws IOException {
+            try {
+                OutputStream out = new BufferedOutputStream(
+                        connection.getOutputStream()
+                );
+                InputStream in = new BufferedInputStream(
+                        connection.getInputStream()
+                );
+                // 只读取第一行，这是我们需要的全部内容
+                StringBuilder request = new StringBuilder(80);
+                while (true) {
+                    int c = in.read();
+                    if (c == '\r' || c == '\n' || c == -1) break;
+                    request.append((char) c);
+                }
+                // 如果是HTTP/1.0或以后版本，这发送一个MIME首部
+                if (request.toString().contains("HTTP/")) {
+                    out.write(header);
+                }
+                out.write(content);
+                out.flush();
+            } catch (IOException ex) {
+                logger.log(Level.WARNING, "Error writing to client", ex);
+            } finally {
+                connection.close();
+            }
+            return null;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        args = new String[]{"D:\\Temp\\1.html"};
+        // 设置要监听的窗口
+        int port;
+        try {
+            port = Integer.parseInt(args[1]);
+            if (port < 1 || port > 65535) port = 80;
+        } catch (RuntimeException ex) {
+            port = 80;
+        }
+
+        String encoding = "UTF-8";
+        if (args.length > 2) encoding = args[2];
+
+        try {
+            Path path = Paths.get(args[0]);
+            byte[] data = Files.readAllBytes(path);
+
+            String contentType = URLConnection.getFileNameMap().getContentTypeFor(args[0]);
+            SingleFileHTTPServer server = new SingleFileHTTPServer(data, encoding,
+                    contentType, port);
+            server.start();
+
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            System.out.println(
+                    "Usage: java SingleFileHTTPServer filename port encoding");
+        } catch (IOException ex) {
+            logger.severe(ex.getMessage());
+        }
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
