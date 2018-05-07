@@ -14,7 +14,7 @@
   + [Book_Maven实战](Notes_JavaWeb/Book_Maven实战)
   + [Book_NettyInAction](Notes_JavaWeb/Book_NettyInAction)
 + [**Notes_Linux**](Notes_Linux) :
-+ [**Notes_Plan**](Notes_Plan) :bookmark_tabs: [:up:](#Notes_AlgorithmTraining)
++ [**Notes_Plan**](Notes_Plan) :bookmark_tabs: 
   + [Plan_学习计划](Notes_Plan/Plan_学习计划.md)
 + [**Notes_Subject**](Notes_Subject) :books:
   + [Subject_网络通信程序设计](Notes_Subject/Subject_网络通信程序设计)
