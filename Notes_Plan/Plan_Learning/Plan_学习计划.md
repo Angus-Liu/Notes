@@ -4,7 +4,7 @@
 - [x] **Java：**《实现Java高并发程序设计》（略过了的Java8及后续章节）
 - [x] **Java：**《Android校招面试指南（Java部分）》（预计完成时间5月5号前）
 - [ ] **Maven：**《Maven实战》（**5月7号**）
-- [ ] **Java：**《Java Network Programming》（《Netty In Action》**先修课**）
+- [x] **Java：**《Java Network Programming》（《Netty In Action》**先修课**）
 - [ ] **Netty：**《Netty In Action》（**5月10号**）
 - [ ] **English：**《赖世雄经典语法》
 - [ ] **Spring：**《Spring In Action》（**5月15号**）
@@ -23,12 +23,10 @@
 - [ ] **软件工程：**“图书管理系统”（要求：需求分析、概要设计等，**5月15号**之前完成）
 - [x] **网络通信程序设计：**“MyIM服务端聊天记录”和“echo V5.0”（23号及26号之前）
 - [ ] **网络通信程序设计：**“聊天室”（**5月4号**之前完成）
-- [ ] **网络通信程序设计：**登录/注册界面完成、聊天室需求分析（**5月9号**之前）
+- [ ] **网络通信程序设计：** 登录/注册界面完成、聊天室需求分析（**5月9号**之前）
 
 ##### ▶ 待学知识（Knowledge that needs to be mastered）
 
 - [x] **技巧：记忆性学习**时听歌**影响**效率，**创造性学习**时听歌**提升**效率
 - [x] **Java：** Java NIO
-- [ ] **Java：** Java网络编程
-
-
+- [x] **Java：** Java网络编程
