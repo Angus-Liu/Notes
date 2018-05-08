@@ -1,20 +1,21 @@
 #### ▶ 待看书籍（Books that need to be read）
 
+- [ ] **English：**《赖世雄经典语法》
 - [x] **Java：**《Java8 In Action》（略过了11章以及13章之后部分）
 - [x] **Java：**《实现Java高并发程序设计》（略过了的Java8及后续章节）
 - [x] **Java：**《Android校招面试指南（Java部分）》（预计完成时间5月5号前）
-- [ ] **Maven：**《Maven实战》（**5月7号**）
 - [x] **Java：**《Java Network Programming》（《Netty In Action》**先修课**）
-- [ ] **Netty：**《Netty In Action》（~~**5月10号**~~ **5月20号**）
-- [ ] **English：**《赖世雄经典语法》
-- [ ] **Spring：**《Spring In Action》（**5月15号**）
-- [ ] **Linux：**《Linux命令行与shell脚本编程》
+- [ ] **Java：**《Netty In Action》（~~**5月10号**~~ **5月20号**）
 - [ ] **JavaWeb：**《Head First Servlet & JSP》
+- [ ] **JavaWeb：**《Spring In Action》（**5月15号**）
+- [x] **Linux：**《鸟哥的Linux私房菜》
+- [ ] **Linux：**《Linux命令行与shell脚本编程》
+- [ ] **Maven：**《Maven实战》（~~**5月7号**~~ **5月17号**）
 
 #### ▶ 待学课程（Courses that need to be learned）
 
+- [ ] **JavaWeb：**《2小时学会Spring Boot》
 - [x] **Maven：**《项目管理利器——maven》
-- [ ] **Spring：**《2小时学会Spring Boot》
 
 #### ▶ 待做作业（Homework that needs to be done）
 
