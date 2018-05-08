@@ -75,7 +75,9 @@
 
 25. 运行当前代码   Ctrl + Shift + F10
 
-26. IntelliJ IDEA生成foreach或者loop的快捷键 
+26. 弹出与之相关的类源码窗口    Ctrl + Shift + 左键
+
+27. IntelliJ IDEA生成foreach或者loop的快捷键 
 
     ```java
     iter    Iterate (for each..in)   
