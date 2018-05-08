@@ -16,9 +16,14 @@
   + [Book_Maven实战](Notes_JavaWeb/Book_Maven实战)
   + [Book_NettyInAction](Notes_JavaWeb/Book_NettyInAction)
 + [**Notes_Linux**](Notes_Linux) 
+  + [Book_LinuxCommandLineAndShellScriptingBible](Notes_Linux/Book_LinuxCommandLineAndShellScriptingBible )
+  + [Book_鸟哥的Linux私房菜（基础学习篇）](Notes_Linux/Book_鸟哥的Linux私房菜（基础学习篇）) 
++ [**Notes_Other** ](Notes_Other )
 + [**Notes_Plan**](Notes_Plan) 
-  + [Plan_学习计划](Notes_Plan/Plan_学习计划.md)
+  + [Plan_Learning](Notes_Plan/Plan_Learning )
+  + [Plan_Read ](Notes_Plan/Plan_Read )
 + [**Notes_Subject**](Notes_Subject) 
+  + [Subject_企业级网络开发](Notes_Subject/Subject_企业级网络开发 )
   + [Subject_网络通信程序设计](Notes_Subject/Subject_网络通信程序设计)
 
 
