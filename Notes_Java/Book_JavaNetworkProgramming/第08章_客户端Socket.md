@@ -190,7 +190,7 @@ public Socket(InetAddress host, int port, InetAddress interface, int localPort) 
 
 该Socket连接到前两个参数指定的主机和端口，后两个参数则指定它的本地网络接口和端口。网路接口可以是物理接口（例如，一个以太网卡），也可以是虚拟接口（一个有多个IP地址的多宿主主机）。如果localPort参数传入0，Java会随机选择1024到65535之间的一个可用端口。
 
-## GUI应用的中Socket
+## GUI应用中的Socket
 
 ### 网络客户库
 
