@@ -126,7 +126,7 @@ public class DictClient {
 }
 ```
 
-#### 半关闭Socket
+### 半关闭Socket
 
 close()方法同时关闭Socket的输入和输出。shutdownInput()和shutdownOutput()方法可以只关闭连接的一半。isInputShutdown()和isOutputShutdown()方法分别指出输入流和输出流是打开的还是关闭的。
 
