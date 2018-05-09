@@ -158,4 +158,14 @@
 
 # Chrome 篇
 
- 
+#  Typora
+
+1. 显示/隐藏侧边栏    Ctrl + Shift + L
+
+2. 打字机模式    Ctrl + Shift + T
+
+3. 应用内窗口切换    Ctrl + Tab
+
+4. 列表增加/减少缩进    Ctrl + ] / Ctrl + [
+
+   
