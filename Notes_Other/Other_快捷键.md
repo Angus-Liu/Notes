@@ -71,13 +71,15 @@
 
 23. **子类或子类方法实现    Ctrl + Alt + B**
 
-24. 查看继承关系  Ctrl + H
+24. **文件结构**    Ctrl + F12
 
-25. 运行当前代码   Ctrl + Shift + F10
+25. 查看继承关系  Ctrl + H
 
-26. 弹出与之相关的类源码窗口    Ctrl + Shift + 左键
+26. 运行当前代码   Ctrl + Shift + F10
 
-27. IntelliJ IDEA生成foreach或者loop的快捷键 
+27. 弹出与之相关的类源码窗口    Ctrl + Shift + 左键
+
+28. IntelliJ IDEA生成foreach或者loop的快捷键 
 
     ```java
     iter    Iterate (for each..in)   
