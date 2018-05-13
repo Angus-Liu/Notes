@@ -1,6 +1,6 @@
 ## Netty In Action
 
-> 记录学习**Netty**的历程，参考自书籍[《Netty In Action（Netty实战）》](https://book.douban.com/subject/27038538/)
+> 记录学习**Netty**的历程，参考自书籍[《Netty In Action》](https://book.douban.com/subject/27038538/)。
 >
 > 下载链接：<http://readfree.me/book/27038538/> 
 

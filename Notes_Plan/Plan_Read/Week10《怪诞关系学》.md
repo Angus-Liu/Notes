@@ -18,6 +18,6 @@ Week10《怪诞关系学》
 
 社会需要这种多样性，也需要建立在你我互相尊重的基石上的平等性。少数人拥有较高的权利，不过这种权利也带代表着“协调”、“倾听”、“责任”与“明辨”。
 
-下载链接（我的百度网盘）：链接：https://pan.baidu.com/s/1KoVBheLTsDQtcZGJ0yLQwQ 密码：7lx2
+下载链接（我的百度网盘）：https://pan.baidu.com/s/1KoVBheLTsDQtcZGJ0yLQwQ 密码：7lx2
 
 ![1525566461429](assets/1525566461429.png)
