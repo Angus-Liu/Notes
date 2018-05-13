@@ -66,16 +66,16 @@ $ mvn clean compile
 [INFO] Building Maven Hello World Project 1.0-SNAPSHOT
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO]
-# Maven首先执行了clean:clean任务，删除target/目录
+# Maven首先执行了maven-clean-plugin:2.5:clean任务，删除target/目录
 [INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ hello-world ---
 [INFO] Deleting E:\Temp\helloworld\target
 [INFO]
-# 接着执行resources:resources任务（未定义项目资源，暂且略过）
+# 接着执行maven-resources-plugin:2.6:resourcess任务（未定义项目资源，暂且略过）
 [INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ hello-world ---
 [WARNING] Using platform encoding (GBK actually) to copy filtered resources, i.e. build is platform dependent!
 [INFO] skip non existing resourceDirectory E:\Temp\helloworld\src\main\resources
 [INFO]
-# 最后执行compiler:compile任务，将项目主代码编译至target/classes目录
+# 最后执行maven-compiler-plugin:3.1:compile任务，将项目主代码编译至target/classes目录
 [INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ hello-world ---
 [INFO] Changes detected - recompiling the module!
 [WARNING] File encoding has not been set, using platform encoding GBK, i.e. build is platform dependent!
