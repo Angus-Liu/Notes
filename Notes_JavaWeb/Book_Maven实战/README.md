@@ -25,4 +25,8 @@
 + [第15章_生成项目站点](第15章_生成项目站点.md)
 + [第16章_m2eclipse](第16章_m2eclipse.md)
 + [第17章_编写Maven插件](第17章_编写Maven插件.md)
++ [第18章_Archetype](第18章_Archetype.md)
++ [附录A_POM元素参考](附录A_POM元素参考.md)
++ [附录B_Settings元素参考](附录B_Settings元素参考.md)
++ [附录C_常用插件列表](附录C_常用插件列表.md)
 
