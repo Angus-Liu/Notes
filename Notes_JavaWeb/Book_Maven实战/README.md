@@ -1,6 +1,6 @@
 ## Maven实战
 
-> 记录学习**Maven**的历程，参考自书籍[《Maven实战》](https://book.douban.com/subject/5345682/)，部分内容根据**Maven**最新版`Apache Maven 3.5.3 `进行了更新。
+> 记录学习**Maven**的历程，方便以后查阅，参考自书籍[《Maven实战》](https://book.douban.com/subject/5345682/)，部分内容根据**Maven**最新版`Apache Maven 3.5.3 `进行了更新。
 >
 > 下载链接：<http://readfree.me/book/5345682/>
 
