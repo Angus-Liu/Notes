@@ -37,11 +37,11 @@ Spring旨在通过模板封装来消除样板式代码，让代码更关注于�
 
 Spring容器并不是只有一个。Spring自带了多个容器实现，可以归为两种不同的类型。
 
-(1) bean工厂（由org.springframework. beans. factory.eanFactory接口定义）是最简单的容器，提供基本的DI支持。
+(1) Bean Factory（由org.springframework. beans.factory. beanFactory接口定义）是最简单的容器，提供基本的DI支持。
 
 (2) 应用上下文（由org.springframework.context.ApplicationContext接口定义）基于BeanFactory构建，并提供应用框架级别的服务，例如从属性文件解析文本信息以及发布应用事件给感兴趣的事件监听者。 对大多数应用来说，功能更强大的应用上下文更受欢迎。
 
-#### 1.2.1 使用应用上下问 
+#### 1.2.1 使用应用上下文 
 
 Spring自带了多种类型的应用上下文，下面是几个常见的：
 
@@ -57,9 +57,7 @@ Spring自带了多种类型的应用上下文，下面是几个常见的：
 
 #### 1.2.2 bean的生命周期
 
-在传统的Java应用中，bean的生命周期很简单。使用Java关键字new进行bean实例化，然后该bean就可以使用了。一旦该bean不再被使用，则由Java自动进行垃圾回收。
-
-相比之下，Spring容器中的bean的生命周期就显得相对复杂多了。正确理解Spring bean的生命周期非常重要，我们或许要利用Spring提供的扩展点来自定义bean的创建过程。下图展示了bean装载到Spring应用上下文中的一个典型的生命周期过程。
+正确理解Spring bean的生命周期非常重要，我们或许要利用Spring提供的扩展点来自定义bean的创建过程。下图展示了bean装载到Spring应用上下文中的一个典型的生命周期过程。
 
 ![1526602083436](assets/1526602083436.png)
 
@@ -75,11 +73,11 @@ Spring自带了多种类型的应用上下文，下面是几个常见的：
 
 (5) 如果bean实现了ApplicationContextAware接口，Spring将调用setApplicationContext()方法，将bean所在的应用上下文的引用传入进来；
 
-(6) 如果bean实现了BeanPostProcessor接口，Spring将调用它们的post-ProcessBeforeInitialization()方法；
+(6) 如果bean实现了BeanPostProcessor接口，Spring将调用它们的postProcessBeforeInitialization()方法；
 
-(7) 如果bean实现了InitializingBean接口，Spring将调用它们的after-PropertiesSet()方法。类似地，如果bean使用init-method声明了初始化方法，该方法也会被调用；
+(7) 如果bean实现了InitializingBean接口，Spring将调用它们的afterPropertiesSet()方法。类似地，如果bean使用init-method声明了初始化方法，该方法也会被调用；
 
-(8) 如果bean实现了BeanPostProcessor接口，Spring将调用它们的post-ProcessAfterInitialization()方法；
+(8) 如果bean实现了BeanPostProcessor接口，Spring将调用它们的postProcessAfterInitialization()方法；
 
 (9) 此时，bean已经准备就绪，可以被应用程序使用了，它们将一直驻留在应用上下文中，直到该应用上下文被销毁；
 
