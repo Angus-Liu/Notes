@@ -37,23 +37,18 @@ Spring旨在通过模板封装来消除样板式代码，让代码更关注于�
 
 Spring容器并不是只有一个。Spring自带了多个容器实现，可以归为两种不同的类型。
 
-(1) Bean Factory（由org.springframework. beans.factory. beanFactory接口定义）是最简单的容器，提供基本的DI支持。
-
-(2) 应用上下文（由org.springframework.context.ApplicationContext接口定义）基于BeanFactory构建，并提供应用框架级别的服务，例如从属性文件解析文本信息以及发布应用事件给感兴趣的事件监听者。 对大多数应用来说，功能更强大的应用上下文更受欢迎。
++ Bean Factory（由org.springframework. beans.factory. beanFactory接口定义）是最简单的容器，提供基本的DI支持。
++ 应用上下文（由org.springframework.context.ApplicationContext接口定义）基于BeanFactory构建，并提供应用框架级别的服务，例如从属性文件解析文本信息以及发布应用事件给感兴趣的事件监听者。 对大多数应用来说，功能更强大的应用上下文更受欢迎。
 
 #### 1.2.1 使用应用上下文 
 
 Spring自带了多种类型的应用上下文，下面是几个常见的：
 
-(1) AnnotationConfigApplicationContext：从一个或多个基于Java的配置类中加载Spring应用上下文。
-
-(2) AnnotationConfigWebApplicationContext：从一个或多个基于Java的配置类中加载Spring Web应用上下文。
-
-(3) ClassPathXmlApplicationContext：从类路径下的一个或多个XML配置文件中加载上下文定义，把应用上下文的定义文件作为类资源。
-
-(4) FileSystemXmlapplicationcontext：从文件系统下的一个或多个XML配置文件中加载上下文定义。
-
-(5) XmlWebApplicationContext：从Web应用下的一个或多个XML配置文件中加载上下文定义。
++ AnnotationConfigApplicationContext：从一个或多个基于Java的配置类中加载Spring应用上下文。
++ AnnotationConfigWebApplicationContext：从一个或多个基于Java的配置类中加载Spring Web应用上下文。
++ ClassPathXmlApplicationContext：从类路径下的一个或多个XML配置文件中加载上下文定义，把应用上下文的定义文件作为类资源。
++ FileSystemXmlapplicationcontext：从文件系统下的一个或多个XML配置文件中加载上下文定义。
++ XmlWebApplicationContext：从Web应用下的一个或多个XML配置文件中加载上下文定义。
 
 #### 1.2.2 bean的生命周期
 
@@ -63,39 +58,28 @@ Spring自带了多种类型的应用上下文，下面是几个常见的：
 
 在bean准备就绪之前，bean工厂执行了若干启动步骤：
 
-(1) Spring对bean进行实例化；
-
-(2) Spring将值和bean的引用注入到bean对应的属性中；
-
-(3) 如果bean实现了BeanNameAware接口，Spring将bean的ID传递给setBean-Name()方法；
-
-(4) 如果bean实现了BeanFactoryAware接口，Spring将调用setBeanFactory()方法，将BeanFactory容器实例传入；
-
-(5) 如果bean实现了ApplicationContextAware接口，Spring将调用setApplicationContext()方法，将bean所在的应用上下文的引用传入进来；
-
-(6) 如果bean实现了BeanPostProcessor接口，Spring将调用它们的postProcessBeforeInitialization()方法；
-
-(7) 如果bean实现了InitializingBean接口，Spring将调用它们的afterPropertiesSet()方法。类似地，如果bean使用init-method声明了初始化方法，该方法也会被调用；
-
-(8) 如果bean实现了BeanPostProcessor接口，Spring将调用它们的postProcessAfterInitialization()方法；
-
-(9) 此时，bean已经准备就绪，可以被应用程序使用了，它们将一直驻留在应用上下文中，直到该应用上下文被销毁；
-
-(10) 如果bean实现了DisposableBean接口，Spring将调用它的destroy()接口方法。同样，如果bean使用destroy-method声明了销毁方法，该方法也会被调用。
+1. Spring对bean进行实例化；
+2. Spring将值和bean的引用注入到bean对应的属性中；
+3. 如果bean实现了BeanNameAware接口，Spring将bean的ID传递给setBean-Name()方法；
+4. 如果bean实现了BeanFactoryAware接口，Spring将调用setBeanFactory()方法，将BeanFactory容器实例传入；
+5. 如果bean实现了ApplicationContextAware接口，Spring将调用setApplicationContext()方法，将bean所在的应用上下文的引用传入进来；
+6. 如果bean实现了BeanPostProcessor接口，Spring将调用它们的postProcessBeforeInitialization()方法；
+7. 如果bean实现了InitializingBean接口，Spring将调用它们的afterPropertiesSet()方法。类似地，如果bean使用init-method声明了初始化方法，该方法也会被调用；
+8. 如果bean实现了BeanPostProcessor接口，Spring将调用它们的postProcessAfterInitialization()方法；
+9. 此时，bean已经准备就绪，可以被应用程序使用了，它们将一直驻留在应用上下文中，直到该应用上下文被销毁；
+10. 如果bean实现了DisposableBean接口，Spring将调用它的destroy()接口方法。同样，如果bean使用destroy-method声明了销毁方法，该方法也会被调用。
 
 ### 1.3 俯瞰Spring风景线
 
 #### 1.3.1 Spring模块
 
-在Spring 4.0中，Spring框架的发布版本包括了20个不同的模块（5.0为21个），每个模块会有3个JAR文件（二进制类库、源码的JAR文件以及JavaDoc的JAR文件）。
-
-这些模块依据其所属的功能可以划分为6类不同的功能，这些模块为开发企业级应用提供了所需的一切。Spring提供了与其他第三方框架和类库的集成点，当Spring不能满足需求时，完全可以考虑其他选择。
+Spring的模块依据其所属的功能可以划分为6类不同的功能，这些模块为开发企业级应用提供了所需的一切。Spring提供了与其他第三方框架和类库的集成点，当Spring不能满足需求时，完全可以考虑其他选择。
 
 ![1526602121151](assets/1526602121151.png)
 
 **Spring核心容器**
 
-容器是Spring框架最核心的部分，它管理着Spring应用中bean的创建、配置和管理。在该模块中，包括了Spring bean工厂，它为Spring提供了DI的功能。基于bean工厂，我们还会发现有多种Spring应用上下文的实现，每一种都提供了配置Spring的不同方式。 除了bean工厂和应用上下文，该模块也提供了许多企业服务，例如E-mail、JNDI访问、EJB集成和调度。 所有的Spring模块都构建于核心容器之上。
+容器是Spring框架最核心的部分，它管理着Spring应用中bean的创建、配置和管理。在该模块中，包括了Spring bean工厂，它为Spring提供了DI的功能。基于bean工厂，还有多种Spring应用上下文的实现，每一种都提供了配置Spring的不同方式。 除了bean工厂和应用上下文，该模块也提供了许多企业服务，例如E-mail、JNDI访问、EJB集成和调度。 所有的Spring模块都构建于核心容器之上。
 
 **Spring的AOP模块**
 
@@ -103,13 +87,9 @@ Spring自带了多种类型的应用上下文，下面是几个常见的：
 
 **数据访问与集成**
 
-使用JDBC编写代码通常会导致大量的样板式代码，例如获得数据库连接、创建语句、处理结果集到最后关闭数据库连接。Spring的JDBC和DAO（Data Access Object）模块抽象了这些样板式代码，使我们的数据库代码变得简单明了，还可以避免因为关闭数据库资源失败而引发的问题。该模块在多种数据库服务的错误信息之上构建了一个语义丰富的异常层，以后我们再也不需要解释那些隐晦专有的SQL错误信息了！
+Spring的JDBC和DAO（Data Access Object）模块抽象了JDBC编写时的样板式代码，使数据库代码变得简单明了，还可以避免因为关闭数据库资源失败而引发的问题。该模块在多种数据库服务的错误信息之上构建了一个语义丰富的异常层，不再需要解释SQL错误信息了。Spring还提供了ORM模块。Spring的ORM模块建立在对DAO的支持之上，并为多个ORM框架提供了一种构建DAO的简便方式。
 
-Spring提供了ORM模块。Spring的ORM模块建立在对DAO的支持之上，并为多个ORM框架提供了一种构建DAO的简便方式。
-
-本模块同样包含了在JMS（Java Message Service）之上构建的Spring抽象层，它会使用消息以异步的方式与其他应用集成。从Spring 3.0开始，本模块还包含对象到XML映射的特性，它最初是Spring Web Service项目的一部分。
-
-除此之外，本模块会使用Spring AOP模块为Spring应用中的对象提供事务管理服务。
+本模块同样包含了在JMS（Java Message Service）之上构建的Spring抽象层，它会使用消息以异步的方式与其他应用集成。本模块还包含对象到XML映射的特性。除此之外，本模块会使用Spring AOP模块为Spring应用中的对象提供事务管理服务。
 
 **Web与远程调用**
 
@@ -126,6 +106,8 @@ Spring的Instrumentation（Instrumentation 使用仪器；乐器法；仪表化�
 鉴于开发者自测的重要性，Spring提供了测试模块以致力于Spring应用的测试。Spring为使用JNDI、Servlet和Portlet编写单元测试提供了一系列的mock对象实现。对于集成测试，该模块为加载Spring应用上下文中的bean集合以及与Spring上下文中的bean进行交互提供了支持。、
 
 #### 1.3.2 Spring Portfolio
+
+Spring远不止Spring框架所下载中包括的那些，整个Spring Portfolio几乎为每一个领域的Java开发都提供了Spring编程模型。
 
 **Spring Web Flow**
 
@@ -149,122 +131,88 @@ Spring Web Flow建立于Spring MVC框架之上，它为基于流程的会话式W
 
 **Spring Data**
 
-Spring Data使得在Spring中使用任何数据库都变得非常容易。尽管关系型数据库统治企业级应用多年，但是现代化的应用正在认识到并不是所有的数据都适合放在一张表中的行和列中。一种新的数据库种类，通常被称之为NoSQL数据库，提供了使用数据的新方法，这些方法会比传统的关系型数据库更为合适。
-
-不管你使用文档数据库，如MongoDB，图数据库，如Neo4j，还是传统的关系型数据库，Spring Data都为持久化提供了一种简单的编程模型。这包括为多种数据库类型提供了一种自动化的Repository机制，它负责为你创建Repository的实现。
+不管使用文档数据库，如MongoDB，图数据库，如Neo4j，还是传统的关系型数据库，Spring Data都为持久化提供了一种简单的编程模型。这包括为多种数据库类型提供了一种自动化的Repository机制，它负责创建Repository的实现。
 
 **Spring Social**
 
-Spring Social，是Spring的一个社交网络扩展模块。社交网络是互联网领域中新兴的一种潮流，越来越多的应用正在融入社交网络网站，例如Facebook或者Twitter。
-
-不过，Spring Social并不仅仅是tweet和好友。尽管名字是这样，但Spring Social更多的是关注连接（connect），而不是社交（social）。它能够帮助你通过REST API连接Spring应用，其中有些Spring应用可能原本并没有任何社交方面的功能目标。
+Spring Social，是Spring的一个社交网络扩展模块。它能够帮助你通过REST API连接Spring应用，其中有些Spring应用可能原本并没有任何社交方面的功能目标。
 
 **Spring Mobile**
+
+移动应用是另一个引人瞩目的软件开发领域。智能手机和平板设备已成为许多用户首选的客户端。Spring Mobile是Spring MVC新的扩展模块，用于支持移动Web应用开发。
+
+**Spring for Android**
 
 与Spring Mobile相关的是Spring Android项目。这个新项目，旨在通过Spring框架为开发基于Android设备的本地应用提供某些简单的支持。最初，这个项目提供了Spring RestTemplate的一个可以用于Android应用之中的版本。它还能与Spring Social协作，使得原生应用可以通过REST API进行社交网络的连接。
 
 **Spring Boot**
 
-Spring极大地简化了众多的编程任务，减少甚至消除了很多样板式代码，如果没有Spring的话，在日常工作中你不得不编写这样的样板代码。Spring Boot是一个崭新的令人兴奋的项目，它以Spring的视角，致力于简化Spring本身。
-
-Spring Boot大量依赖于自动配置技术，它能够消除大部分（在很多场景中，甚至是全部）Spring配置。它还提供了多个Starter项目，不管你使用Maven还是Gradle，这都能减少Spring工程构建文件的大小。
+Spring Boot以Spring的视角，致力于简化Spring本身。Spring Boot大量依赖于自动配置技术，它能够消除大部分Spring配置。它还提供了多个Starter项目，不管使用Maven还是Gradle，这都能减少Spring工程构建文件的大小。
 
 ### 1.4 Spring的新功能
 
 #### 1.4.1 Spring 3.1新特性
 
-Spring 3.1带来了多项有用的新特性和增强，其中有很多都是关于如何简化和改善配置的。除此之外，Spring 3.1还提供了声明式缓存的支持以及众多针对Spring MVC的功能增强。下面的列表展现了Spring 3.1重要的功能升级：
+下面的列表展现了Spring 3.1重要的功能升级：
 
-(1) 为了解决各种环境下（如开发、测试和生产）选择不同配置的问题，Spring 3.1引入了环境profile功能。借助于profile，就能根据应用部署在什么环境之中选择不同的数据源bean；
-
-(2) 在Spring 3.0基于Java的配置之上，Spring 3.1添加了多个enable注解，这样就能使用这个注解启用Spring的特定功能；
-
-(3) 添加了Spring对声明式缓存的支持，能够使用简单的注解声明缓存边界和规则，这与你以前声明事务边界很类似；
-
-(4) 新添加的用于构造器注入的c命名空间，它类似于Spring 2.0所提供的面向属性的p命名空间，p命名空间用于属性注入，它们都是非常简洁易用的；
-
-(5) Spring开始支持Servlet 3.0，包括在基于Java的配置中声明Servlet和Filter，而不再借助于web.xml；
-
-(6) 改善Spring对JPA的支持，使得它能够在Spring中完整地配置JPA，不必再使用persistence.xml文件。
++ 为了解决各种环境下（如开发、测试和生产）选择不同配置的问题，Spring 3.1引入了环境profile功能。借助于profile，就能根据应用部署在什么环境之中选择不同的数据源bean；
++ 在Spring 3.0基于Java的配置之上，Spring 3.1添加了多个enable注解，这样就能使用这个注解启用Spring的特定功能；
++ 添加了Spring对声明式缓存的支持，能够使用简单的注解声明缓存边界和规则，这与以前声明事务边界很类似；
++ 新添加的用于构造器注入的c命名空间，它类似于Spring 2.0所提供的面向属性的p命名空间，p命名空间用于属性注入，它们都是非常简洁易用的；
++ Spring开始支持Servlet 3.0，包括在基于Java的配置中声明Servlet和Filter，而不再借助于web.xml；
++ 改善Spring对JPA的支持，使得它能够在Spring中完整地配置JPA，不必再使用persistence.xml文件。
 
 Spring 3.1还包含了多项针对Spring MVC的功能增强：
 
-(1) 自动绑定路径变量到模型属性中；
-
-(2) 提供了@RequestMappingproduces和consumes属性，用于匹配请求中的Accept和Content-Type头部信息；
-
-(3) 提供了@RequestPart注解，用于将multipart请求中的某些部分绑定到处理器的方法参数中；
-
-(4) 支持Flash属性（在redirect请求之后依然能够存活的属性）以及用于在请求间存放flash属性的RedirectAttributes类型。
++ 自动绑定路径变量到模型属性中；
++ 提供了@RequestMappingproduces和consumes属性，用于匹配请求中的Accept和Content-Type头部信息；
++ 提供了@RequestPart注解，用于将multipart请求中的某些部分绑定到处理器的方法参数中；
++ 支持Flash属性（在redirect请求之后依然能够存活的属性）以及用于在请求间存放flash属性的RedirectAttributes类型。
 
 #### 1.4.2 Spring 3.2新特性
 
-Spring 3.1在很大程度上聚焦于配置改善以及其他的一些增强，包括Spring MVC的增强，而Spring 3.2是主要关注Spring MVC的一个发布版本。Spring MVC 3.2带来了如下的功能提升：
+Spring 3.2是主要关注Spring MVC的一个发布版本。Spring MVC 3.2带来了如下的功能提升：
 
-(1) Spring 3.2的控制器（Controller）可以使用Servlet 3.0的异步请求，允许在一个独立的线程中处理请求，从而将Servlet线程解放出来处理更多的请求；
-
-(2) 尽管从Spring 2.5开始，Spring MVC控制器就能以POJO的形式进行很便利地测试，但是Spring 3.2引入了Spring MVC测试框架，用于为控制器编写更为丰富的测试，断言它们作为控制器的行为行为是否正确，而且在使用的过程中并不需要Servlet容器；
-
-(3) 除了提升控制器的测试功能，Spring 3.2还包含了基于RestTemplate的客户端的测试支持，在测试的过程中，不需要往真正的REST端点上发送请求；
-
-(4) @ControllerAdvice注解能够将通用的@ExceptionHandler、@ InitBinder和@ModelAttributes方法收集到一个类中，并应用到所有控制器上；
-
-(5) 在Spring 3.2之前，只能通过ContentNegotiatingViewResolver使用完整的内容协商（full content negotiation）功能。但是在Spring 3.2中，完整的内容协商功能可以在整个Spring MVC中使用，即便是依赖于消息转换器（message converter）使用和产生内容的控制器方法也能使用该功能；
-
-(6) Spring MVC 3.2包含了一个新的@MatrixVariable注解，这个注解能够将请求中的矩阵变量（matrix variable）绑定到处理器的方法参数中；
-
-(7) 基础的抽象类AbstractDispatcherServletInitializer能够非常便利地配置DispatcherServlet，而不必再使用web.xml。与之类似，当你希望通过基于Java的方式来配置Spring的时候，可以使用Abstract- Annotat ionConfigDispatcherServletInitializer的子类；
-
-(8) 新增了ResponseEntityExceptionHandler，可以用来替代Default- HandlerException Resolver。ResponseEntityExceptionHandler方法会返回ResponseEntity<Object>，而不是ModelAndView；
-
-(9) RestTemplate和@RequestBody的参数可以支持范型；
-
-(10) RestTemplate和@RequestMapping可以支持HTTP PATCH方法；
-
-(11) 在拦截器匹配时，支持使用URL模式将其排除在拦截器的处理功能之外。
++ Spring 3.2的控制器（Controller）可以使用Servlet 3.0的异步请求，允许在一个独立的线程中处理请求，从而将Servlet线程解放出来处理更多的请求；
++ Spring 3.2引入了Spring MVC测试框架，用于为控制器编写更为丰富的测试，断言它们作为控制器的行为行为是否正确，而且在使用的过程中并不需要Servlet容器；
++ Spring 3.2还包含了基于RestTemplate的客户端的测试支持，在测试的过程中，不需要往真正的REST端点上发送请求；
++ @ControllerAdvice注解能够将通用的@ExceptionHandler、@ InitBinder和@ModelAttributes方法收集到一个类中，并应用到所有控制器上；
++ 在Spring 3.2中，完整的内容协商功能可以在整个Spring MVC中使用，即便是依赖于消息转换器（message converter）使用和产生内容的控制器方法也能使用该功能；
++ Spring MVC 3.2包含了一个新的@MatrixVariable注解，这个注解能够将请求中的矩阵变量（matrix variable）绑定到处理器的方法参数中；
++ 基础的抽象类AbstractDispatcherServletInitializer能够非常便利地配置DispatcherServlet，而不必再使用web.xml。与之类似，当希望通过基于Java的方式来配置Spring的时候，可以使用AbstractAnnotat ionConfigDispatcherServletInitializer的子类；
++ 新增了ResponseEntityExceptionHandler，可以用来替代DefaultHandlerExceptionResolver。ResponseEntityExceptionHandler方法会返回ResponseEntity\<Object>，而不是ModelAndView；
++ RestTemplate和@RequestBody的参数可以支持范型；
++ RestTemplate和@RequestMapping可以支持HTTP PATCH方法；
++ 在拦截器匹配时，支持使用URL模式将其排除在拦截器的处理功能之外。
 
 虽然Spring MVC是Spring 3.2改善的核心内容，但是它依然还增加了多项非MVC的功能改善。下面列出了Spring 3.2中几项最为有意思的新特性：
 
-(1) @Autowired、@Value和@Bean注解能够作为元注解，用于创建自定义的注入和bean声明注解；
-
-(2) @DateTimeFormat注解不再强依赖JodaTime。如果提供了JodaTime，就会使用它，否则的话，会使用SimpleDateFormat；
-
-(3) Spring的声明式缓存提供了对JCache 0.5的支持；
-
-(4) 支持定义全局的格式来解析和渲染日期与时间；
-
-(5) 在集成测试中，能够配置和加载WebApplicationContext；
-
-(6) 在集成测试中，能够针对request和session作用域的bean进行测试。
++ @Autowired、@Value和@Bean注解能够作为元注解，用于创建自定义的注入和bean声明注解；
++ @DateTimeFormat注解不再强依赖JodaTime。如果提供了JodaTime，就会使用它，否则的话，会使用SimpleDateFormat；
++ Spring的声明式缓存提供了对JCache 0.5的支持；
++ 支持定义全局的格式来解析和渲染日期与时间；
++ 在集成测试中，能够配置和加载WebApplicationContext；
++ 在集成测试中，能够针对request和session作用域的bean进行测试。
 
 #### 1.4.3 Spring 4.0新特性
 
 在Spring 4.0中包含了很多令人兴奋的新特性，包括：
 
-(1) Spring提供了对WebSocket编程的支持，包括支持JSR-356——Java API for WebSocket；
-
-(2) 鉴于WebSocket仅仅提供了一种低层次的API，急需高层次的抽象，因此Spring 4.0在WebSocket之上提供了一个高层次的面向消息的编程模型，该模型基于SockJS，并且包含了对STOMP协议的支持；
-
-(3) 新的消息（messaging）模块，很多的类型来源于Spring Integration项目。这个消息模块支持Spring的SockJS/STOMP功能，同时提供了基于模板的方式发布消息；
-
-(4) Spring是第一批（如果不说是第一个的话）支持Java 8特性的Java框架，比如它所支持的lambda表达式。别的暂且不说，这首先能够让使用特定的回调接口（如RowMapper和JdbcTemplate）更加简洁，代码更加易读；
-
-(5) 与Java 8同时得到支持的是JSR-310——Date与Time API，在处理日期和时间时，它为开发者提供了比java.util.Date或java.util.Calendar更丰富的API；
-
-(6) 为Groovy开发的应用程序提供了更加顺畅的编程体验，尤其是支持非常便利地完全采用Groovy开发Spring应用程序。随这些一起提供的是来自于Grails的BeanBuilder，借助它能够通过Groovy配置Spring应用；
-
-(7) 添加了条件化创建bean的功能，在这里只有开发人员定义的条件满足时，才会创建所声明的bean；
-
-(8) Spring 4.0包含了Spring RestTemplate的一个新的异步实现，它会立即返回并且允许在操作完成后执行回调；
-
-(9) 添加了对多项JEE规范的支持，包括JMS 2.0、JTA 1.2、JPA 2.1和Bean Validation 1.1。
++ Spring提供了对WebSocket编程的支持，包括支持JSR-356——Java API for WebSocket；
++ 鉴于WebSocket仅仅提供了一种低层次的API，急需高层次的抽象，因此Spring 4.0在WebSocket之上提供了一个高层次的面向消息的编程模型，该模型基于SockJS，并且包含了对STOMP协议的支持；
++ 新的消息（messaging）模块，很多的类型来源于Spring Integration项目。这个消息模块支持Spring的SockJS/STOMP功能，同时提供了基于模板的方式发布消息；
++ Spring是第一批（如果不说是第一个的话）支持Java 8特性的Java框架，比如它所支持的lambda表达式。别的暂且不说，这首先能够让使用特定的回调接口（如RowMapper和JdbcTemplate）更加简洁，代码更加易读；
++ 与Java 8同时得到支持的是JSR-310——Date与Time API，在处理日期和时间时，它为开发者提供了比java.util.Date或java.util.Calendar更丰富的API；
++ 为Groovy开发的应用程序提供了更加顺畅的编程体验，尤其是支持非常便利地完全采用Groovy开发Spring应用程序。随这些一起提供的是来自于Grails的BeanBuilder，借助它能够通过Groovy配置Spring应用；
++ 添加了条件化创建bean的功能，在这里只有开发人员定义的条件满足时，才会创建所声明的bean；
++ Spring 4.0包含了Spring RestTemplate的一个新的异步实现，它会立即返回并且允许在操作完成后执行回调；
++ 添加了对多项JEE规范的支持，包括JMS 2.0、JTA 1.2、JPA 2.1和Bean Validation 1.1。
 
 ### 1.5 小结
 
-(1) Spring致力于简化企业级Java开发，促进代码的松散耦合。成功的关键在于依赖注入DI和面向切面编程AOP。
+Spring致力于简化企业级Java开发，促进代码的松散耦合。成功的关键在于依赖注入DI和面向切面编程AOP。
 
-(2) DI是组装应用对象的一种方式，借助这种方式对象无需知道依赖来自何处或者依赖的实现方式。不同于自己获取依赖对象，对象会在运行期赋予它们所依赖的对象。依赖对象通常会通过接口了解所注入的对象，这样的话就能确保低耦合。
-
-(3) AOP可以帮助应用将散落在各处的逻辑汇集于一处——切面。当Spring装配bean的时候，这些切面能够在运行期编织起来，这样就能非常有效地赋予bean新的行为。
++ DI是组装应用对象的一种方式，借助这种方式对象无需知道依赖来自何处或者依赖的实现方式。不同于自己获取依赖对象，对象会在运行期赋予它们所依赖的对象。依赖对象通常会通过接口了解所注入的对象，这样的话就能确保低耦合。
++ AOP可以帮助应用将散落在各处的逻辑汇集于一处——切面。当Spring装配bean的时候，这些切面能够在运行期编织起来，这样就能非常有效地赋予bean新的行为。
 
  
