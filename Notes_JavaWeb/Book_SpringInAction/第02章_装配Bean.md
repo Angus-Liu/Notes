@@ -389,8 +389,468 @@ public CDPlayer cdPlayer(CompactDisc compactDisc){
 </beans>
 ```
 
-在这里，我们使用了c-命名空间来声明构造器参数，它作为\<bean>元素的一个属性，不过这个属性的名字有点诡异。 
+这里使用了c-命名空间来声明构造器参数，它作为\<bean>元素的一个属性，其构成如下：
 
 ![1526602664332](assets/1526602664332.png)
 
+也可以使用索引来指代构造器参数：
+
+```xml
+<!-- 以下划线开头是因为XML不允许数字作为属性的第一个字符 -->
+<bean id="cdPlayer" class="com.angus.stereo.xmlconfig.CDPlayer" c:_0-ref="compactDisc"/>
+```
+
  **将字面量注入到构造器中** 
+
+创建CompactDisc的一个新实现，用于实现字面量（文本）值的注入：
+
+```java
+package com.angus.stereo.xmlconfig;
+
+public class BlankDisc implements CompactDisc {
+
+    private String title;
+    private String artist;
+
+    public BlankDisc(String title, String artist) {
+        this.title = title;
+        this.artist = artist;
+    }
+
+    public void play() {
+        System.out.println("Playing " + title + " by " + artist);
+    }
+
+}
+```
+
+实现字面量值的注入：
+
+```xml
+<!-- <constructor-arg>元素实现 -->
+<bean id="compactDisc" class="com.angus.stereo.xmlconfig.BlankDisc">
+    <constructor-arg value="Sgt. Pepper's Lonely Hearts Club Band"/>
+    <constructor-arg value="The Beatles"/>
+</bean>
+
+<!-- c-命名空间实现（使用索引） -->
+<bean id="compactDisc" class="com.angus.stereo.xmlconfig.BlankDisc" 
+      c:title="Sgt. Pepper's Lonely Hearts Club Band" 
+      c:artist="The Beatles"/>
+<bean id="compactDisc" class="com.angus.stereo.xmlconfig.BlankDisc" 
+      c:_0="Sgt. Pepper's Lonely Hearts Club Band" 
+      c:_1="The Beatles"/>
+```
+
+**装配集合**
+
+构造器参数中含有集合时，c-命名空间将无法使用：
+
+```java
+package com.angus.stereo.xmlconfig.collections;
+
+import java.util.List;
+
+import com.angus.stereo.xmlconfig.CompactDisc;
+
+public class BlankDisc implements CompactDisc {
+
+    private String title;
+    private String artist;
+    private List<String> tracks;
+
+    public BlankDisc(String title, String artist, List<String> tracks) {
+        this.title = title;
+        this.artist = artist;
+        this.tracks = tracks;
+    }
+
+    public void play() {
+        System.out.println("Playing " + title + " by " + artist);
+        for (String track : tracks) {
+            System.out.println("-Track: " + track);
+        }
+    }
+
+}
+```
+
+在声明该BlankDisc的bean时，必须为其提供一个磁道列表：
+
+```xml
+<!-- 可以通过下面的方法为tracks参数传递null -->
+<bean id="compactDisc" class="com.angus.stereo.xmlconfig.collections.BlankDisc">
+    <constructor-arg value="Sgt. Pepper's Lonely Hearts Club Band"/>
+    <constructor-arg value="The Beatles"/>
+    <constructor-arg><null/></constructor-arg>
+</bean>
+
+<!-- 最好的解决方法是为其提供一个列表 -->
+<bean id="compactDisc" class="com.angus.stereo.xmlconfig.collections.BlankDisc">
+    <constructor-arg value="Sgt. Pepper's Lonely Hearts Club Band"/>
+    <constructor-arg value="The Beatles"/>
+    <constructor-arg>
+        <!-- 除<list>元素之外，还可以是<array>、<set>、<map>等 -->
+        <list>
+            <!-- 与之类似，当列表中包含的元素是引用变量时，也可以使用<ref>元素来代替<value> -->
+            <value>Sgt. Pepper's Lonely Hearts Club Band</value>
+            <value>With a Little Help from My Friends</value>
+            <value>Lucy in the Sky with Diamonds</value>
+            <value>Getting Better</value>
+            <value>Fixing a Hole</value>
+            <value>She's Leaving Home</value>
+            <value>Being for the Benefit of Mr. Kite!</value>
+            <value>Within You Without You</value>
+            <value>When I'm Sixty-Four</value>
+            <value>Lovely Rita</value>
+            <value>Good Morning Good Morning</value>
+            <value>Sgt. Pepper's Lonely Hearts Club Band (Reprise)</value>
+            <value>A Day in the Life</value>
+        </list>
+    </constructor-arg>
+</bean>
+```
+
+#### 2.4.4 设置属性
+
+对CDPlayer进行修改，查看Spring XML实现属性注入：
+
+```java
+package com.angus.stereo.xmlconfig;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class CDPlayer implements MediaPlayer {
+    private CompactDisc compactDisc;
+
+    // 将compactDisc更改为setter方法注入
+    @Autowired
+    public void setCompactDisc(CompactDisc compactDisc) {
+        this.compactDisc = compactDisc;
+    }
+
+    public void play() {
+        compactDisc.play();
+    }
+}
+```
+
+修改XML，实现属性注入：
+
+```xml
+<bean id="cdPlayer" class="com.angus.stereo.xmlconfig.CDPlayer">
+    <!-- <property>元素为属性的Setter方法所提供的功能与<constructor-arg>元素为构造器所提供的功能是一样的 -->
+    <!-- 在本例中，它引用了ID为compactDisc的bean（通过ref属性），并将其注入到compactDisc属性中（通过setCompactDisc()方法） -->
+    <property name="compactDisc" ref="compactDisc"/>
+</bean>
+```
+
+Spring为\<constructor-arg>元素提供了c-命名空间作为替代方案，与之类似，Spring提供了更加简洁的p-命名空间，作为\<property>元素的替代方案：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 添加了p-命名空间 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <bean id="compactDisc" class="com.angus.stereo.xmlconfig.BlankDisc"
+          c:title="Sgt. Pepper's Lonely Hearts Club Band"
+          c:artist="The Beatles"/>
+
+    <bean id="cdPlayer" class="com.angus.stereo.xmlconfig.CDPlayer" p:compactDisc-ref="compactDisc"/>
+
+</beans>
+```
+
+p-命名空间中属性所遵循的命名约定与c-命名空间中的属性类似：
+
+![1526973539792](assets/1526973539792.png)
+
+**将字面量注入到属性中**
+
+属性也可以注入字面量，这与构造器参数非常类似。新的BlankDisc类如下所示：
+
+```java
+package com.angus.stereo.xmlconfig.collections;
+
+import java.util.List;
+
+import com.angus.stereo.xmlconfig.CompactDisc;
+
+public class BlankDisc implements CompactDisc {
+
+    private String title;
+    private String artist;
+    private List<String> tracks;
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
+    public void setTracks(List<String> tracks) {
+        this.tracks = tracks;
+    }
+
+    public void play() {
+        System.out.println("Playing " + title + " by " + artist);
+        for (String track : tracks) {
+            System.out.println("-Track: " + track);
+        }
+    }
+}
+```
+
+实现字面量属性注入：
+
+```xml
+<bean id="reallyBlankDisc" class="com.angus.stereo.xmlconfig.properties.BlankDisc">
+    <property name="title" value="Sgt. Pepper's Lonely Hearts Club Band"/>
+    <property name="artist" value="The Beatles"/>
+    <property name="tracks">
+        <list>
+            <value>Sgt. Pepper's Lonely Hearts Club Band</value>
+            <value>With a Little Help from My Friends</value>
+            <value>Lucy in the Sky with Diamonds</value>
+            <value>Getting Better</value>
+            <value>Fixing a Hole</value>
+            <value>She's Leaving Home</value>
+            <value>Being for the Benefit of Mr. Kite!</value>
+            <value>Within You Without You</value>
+            <value>When I'm Sixty-Four</value>
+            <value>Lovely Rita</value>
+            <value>Good Morning Good Morning</value>
+            <value>Sgt. Pepper's Lonely Hearts Club Band (Reprise)</value>
+            <value>A Day in the Life</value>
+        </list>
+    </property>
+</bean>
+```
+
+不能使用p-命名空间来装配集合，没有便利的方式使用p-命名空间来指定一个值（或bean引用）的列表。但是，我们可以使用Spring util-命名空间中的一些功能来简化BlankDiscbean：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 添加util-命名空间，辅助p-命名空间 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p" 
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <util:list id="trackList">
+        <value>Sgt. Pepper's Lonely Hearts Club Band</value>
+        <value>With a Little Help from My Friends</value>
+        <value>Lucy in the Sky with Diamonds</value>
+        <value>Getting Better</value>
+        <value>Fixing a Hole</value>
+        <value>She's Leaving Home</value>
+        <value>Being for the Benefit of Mr. Kite!</value>
+        <value>Within You Without You</value>
+        <value>When I'm Sixty-Four</value>
+        <value>Lovely Rita</value>
+        <value>Good Morning Good Morning</value>
+        <value>Sgt. Pepper's Lonely Hearts Club Band (Reprise)</value>
+        <value>A Day in the Life</value>
+    </util:list>
+
+    <bean id="reallyBlankDisc" class="com.angus.stereo.xmlconfig.properties.BlankDisc"
+          p:title="Sgt. Pepper's Lonely Hearts Club Band"
+          p:artist="The Beatles"
+          p:tracks-ref="trackList"/>
+
+</beans>
+```
+
+util-命名空间提供的所有元素：
+
+| 元素               | 描述                                               |
+| :----------------- | :------------------------------------------------- |
+| util:constant      | 引用某个类型的public static域，并将其暴露为bean    |
+| util:list          | 创建一个java.util.List类型的bean，其中包含值或引用 |
+| util:map           | 创建一个java.util.Map类型的bean，其中包含值或引用  |
+| util:properties    | 创建一个java.util.Properties类型的bean             |
+| util:property-path | 创建一个java.util.Properties类型的bean             |
+| util:set           | 创建一个java.util.Set类型的bean，其中包含值或引用  |
+
+### 2.5 导入和混合配置
+
+在典型的Spring应用中，可能会同时使用自动化和显式配置。这些配置方案都不是互斥的，尽可以将JavaConfig的组件扫描和自动装配以及XML配置混合在一起。
+
+#### 2.5.1 在JavaConfig中引用XML配置
+
+假设CDPlayerConfig已经变得有些笨重，故而将BlankDisc从CDPlayerConfig拆分出来，定义到它自己的CDConfig类：
+
+```java
+package soundsystem;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class CDConfig {
+  @Bean
+  public CompactDisc compactDisc() {
+    return new SgtPeppers();
+  }
+}
+```
+
+需要有一种方式将这两个类组合在一起。一种方法就是在CDPlayerConfig中使用@Import注解导入CDConfig：
+
+```java
+package soundsystem;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+
+@Configuration
+@Import(CDConfig.class)
+public class CDPlayerConfig {
+
+    @Bean
+    public CDPlayer cdPlayer(CompactDisc compactDisc) {
+        return new CDPlayer(compactDisc);
+    }
+
+}
+```
+
+或者采用一个更好的方法，创建一个更高级别的SoundSystemConfig，在这个类中使用@Import将两个配置类组合在一起：
+
+```java
+package soundsystem;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
+
+@Configuration
+@Import({CDPlayerConfig.class, CDConfig.class})
+public class SoundSystemConfig {
+
+}
+```
+
+假设希望通过XML来配置BlankDisc：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="compactDisc"
+          class="soundsystem.BlankDisc"
+          c:_0="Sgt. Pepper's Lonely Hearts Club Band"
+          c:_1="The Beatles">
+        <constructor-arg>
+            <list>
+                <value>Sgt. Pepper's Lonely Hearts Club Band</value>
+                <value>With a Little Help from My Friends</value>
+                <value>Lucy in the Sky with Diamonds</value>
+                <value>Getting Better</value>
+                <value>Fixing a Hole</value>
+                <!-- ...other tracks omitted for brevity... -->
+            </list>
+        </constructor-arg>
+    </bean>
+
+</beans>
+```
+
+假设BlankDisc定义在名为cd-config.xml的文件中，该文件位于根类路径下，那么可以修改SoundSystemConfig，让它使用@ImportResource注解，让Spring同时加载它和其他基于Java的配置：
+
+```java
+package soundsystem;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
+
+// 配置在JavaConfig中的CDPlayer以及配置在XML中BlankDisc都会被加载到Spring容器之中
+@Configuration
+@Import(CDPlayerConfig.class)
+@ImportResource("classpath:cd-config.xml")
+public class SoundSystemConfig {
+
+}
+```
+
+#### 2.5.2 在XML配置中引用JavaConfig
+
+为了将JavaConfig类导入到XML配置中，可以这样声明bean：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- CDConfig中配置了cdPlayer所需要的compactDisc bean -->
+    <bean class="soundsystem.CDConfig"/>
+
+    <bean id="cdPlayer" class="soundsystem.CDPlayer" c:cd-ref="compactDisc"/>
+
+</beans>
+```
+
+类似地，还可以创建一个更高层次的配置文件（根配置，root configuration），这个文件不声明任何的bean，只是负责将两个或更多的配置组合起来：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- JavaConfig -->
+    <bean class="soundsystem.CDConfig"/>
+    <!-- XMLConfig -->
+    <import resource="cdplayer-config.xml"/>
+
+</beans>
+```
+
+### 2.6 小结
+
+Spring框架的核心是Spring容器。容器负责管理应用中组件的生命周期，它会创建这些组件并保证它们的依赖能够得到满足，这样的话，组件才能完成预定的任务。
+
+Spring中装配bean的三种主要方式：自动化配置、基于Java的显式配置以及基于XML的显式配置。
+
+尽可能使用自动化配置，以避免显式配置所带来的维护成本。如果确实需要显式配置Spring的话，应该优先选择基于Java的配置，它比基于XML的配置更加强大、类型安全并且易于重构。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
