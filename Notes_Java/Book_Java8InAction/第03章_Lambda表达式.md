@@ -212,9 +212,7 @@ Apple a2 = c2.apply(110);调用该Function函数的apply方法，并给出要求
 
 (5) Lambda表达式允许你直接内联，为函数式接口的抽象方法提供实现，并且将整个表达式 作为函数式接口的一个实例。 
 
-(6) Java 8自带一些常用的函数式接口，放在java.util.function包里，包括Predicate
-
-\<T>、 Function\<T,R>、 Supplier\<T>、 Consumer\<T>和BinaryOperator\<T>.
+(6) Java 8自带一些常用的函数式接口，放在java.util.function包里，包括Predicate\<T>、 Function\<T,R>、 Supplier\<T>、 Consumer\<T>和BinaryOperator\<T>.
 
 (7) 为了避免装箱操作，对Predicate\<T>和Function\<T, R>等通用函数式接口的原始类型 特化： IntPredicate、 IntToLongFunction等。 
 
