@@ -447,13 +447,245 @@ public void shouldShowPagedSpittles() throws Exception {
 
 #### 5.3.2 通过路径参数接收输入 
 
+假设应用程序需要根据给定的ID来展现某一个Spittle记录。在理想情况下，要识别的资源（Spittle）应该通过URL路径进行标示，而不是通过查询参数。对“/spittles/12345”发起GET请求要优于对“/spittles/show?spittle_id=12345”发起请求。
 
+为此，需要在SpittleController中为其添加新的方法：
 
+```java
+// 为了实现这种路径变量，Spring MVC允许在@RequestMapping路径中添加占位符（占位符名称要用"{}"括起来）
+// 因为方法的参数名碰巧与占位符的名称相同，故而可以省略@PathVariable中的value属性（这里给出了）
+@RequestMapping(value = "/{spittleId}", method = RequestMethod.GET)
+public String spittle(@PathVariable(value = "spittleId") long spittleId, Model model) {
+    // spittle()方法会将参数传递到SpittleRepository的findOne()方法中，
+    // 用来获取某个Spittle对象，然后将Spittle对象添加到模型中
+    model.addAttribute(spittleRepository.findOne(spittleId));
+    return "spittle";
+}
+```
 
+测试对某个Spittle的请求，其中ID要在路径变量中指定：
 
+```java
+@Test
+public void testSpittle() throws Exception {
+    Spittle expectedSpittle = new Spittle("Hello", new Date());
+    
+    SpittleRepository mockRepository = mock(SpittleRepository.class);
+    when(mockRepository.findOne(12345)).thenReturn(expectedSpittle);
+    SpittleController controller = new SpittleController(mockRepository);
+    MockMvc mockMvc = standaloneSetup(controller).build();
+    
+    mockMvc.perform(get("/spittles/12345")) // 通过路径请求资源
+        .andExpect(view().name("spittle"))
+        .andExpect(model().attributeExists("spittle"))
+        .andExpect(model().attribute("spittle", expectedSpittle));
+}
+```
 
+### 5.4 处理表单
 
+像提供内容一样，Spring MVC的控制器也为表单处理提供了良好的支持。
 
+使用表单分为两个方面：展现表单以及处理用户通过表单提交的数据。在Spittr应用中，需要有个表单让新用户进行注册。SpitterController是一个新的控制器，目前只有一个请求处理的方法来展现注册表单：
+
+```java
+package spittr.web;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/spitter")
+public class SpitterController {
+    // 处理对"/spitter/register"的GET请求
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public String showRegistrationForm(){
+        return "registerForm";
+    }
+}
+```
+
+测试展现表单的控制器方法：
+
+```java
+package spittr.web;
+import org.junit.Test;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+
+public class SpitterControllerTest {
+
+    @Test
+    public void shouldShowRegisteration() throws Exception {
+        SpitterController controller = new SpitterController();
+        // 构建MockMvc
+        MockMvc mockMvc = standaloneSetup(controller).build();
+        mockMvc.perform(get("/spitter/register"))
+                .andExpect(view().name("registerForm")); // 断言registerForm视图
+    }
+}
+
+```
+
+#### 5.4.1 编写处理表单的控制器
+
+当处理注册表单的POST请求时，控制器需要接受表单数据并将表单数据保存为Spitter对象。最后，为了防止重复提交，应该将浏览器重定向到新创建用户的基本信息页面：
+
+```java
+@Controller
+@RequestMapping("/spitter")
+public class SpitterController {
+
+    private SpitterRepository spitterRepository;
+
+    @Autowired // 注入SpitterRepository
+    public SpitterController(SpitterRepository spitterRepository) {
+        this.spitterRepository = spitterRepository;
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public String showRegistrationForm() {
+        return "registerForm";
+    }
+
+    // 创建processRegistration()方法，它接受一个Spitter对象作为参数
+    // Spitter对象中的属性将会使用请求中同名的参数进行填充
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public String processRegistration(Spitter spitter) {
+        spitterRepository.save(spitter);  // 调用SpitterRepository的save()方法保存Spitter
+        // 当InternalResourceViewResolver看到视图格式中的"redirect:"前缀时，
+        // 它会要将其解析为重定向的规则，而不是视图的名称;
+        // InternalResourceViewResolver还能识别"forward:"前缀，
+        // 当它发现视图格式中以“forward:”作为前缀时，
+        // 请求将会前往（forward）指定的URL路径，而不再是重定向
+        return "redirect:/spitter/" + spitter.getUsername(); // 重定向到用户的基本信息页
+    }
+}
+
+```
+
+测试SpitterController中处理表单的方法：
+
+```java
+    @Test
+    public void shouldProcessRegistration() throws Exception {
+        SpitterRepository mockRepository = mock(SpitterRepository.class);
+        Spitter unsaved = new Spitter("angus", "123456", "Angus", "Liu", "angus.liu96@gmail.com");
+        Spitter saved = new Spitter("angus", "123456", "Angus", "Liu", "angus.liu96@gmail.com");
+
+        when(mockRepository.save(unsaved)).thenReturn(saved);
+
+        SpitterController controller = new SpitterController(mockRepository);
+
+        MockMvc mockMvc = standaloneSetup(controller).build();
+
+        mockMvc.perform(post("/spitter/register")
+                .param("username", "angus")
+                .param("password", "123456")
+                .param("firstName", "Angus")
+                .param("lastName", "Liu")
+                .param("email", "angus.liu96@gmail.com"))
+                .andExpect(redirectedUrl("/spitter/angus"));
+        verify(mockRepository, atLeastOnce()).save(unsaved);
+    }
+```
+
+往SpitterController中添加一个处理器方法，用来处理对基本信息页面的请求：
+
+```java
+@RequestMapping(value = "/{username}", method = RequestMethod.GET)
+public String showSpitterProfile(@PathVariable String username, Model model){
+    Spitter spitter = spitterRepository.findByUsername(username);
+    model.addAttribute(spitter);
+    return "profile";
+}
+```
+
+#### 5.4.2 校验表单
+
+从Spring 3.0开始，在Spring MVC中提供了对Java校验API（Java Validation API，又称JSR-303）的支持。在Spring MVC中要使用Java校验API的话，并不需要什么额外的配置。只要保证在类路径下包含这个Java API的实现即可，比如Hibernate Validator。
+
+Java校验API定义了多个注解，这些注解可以放到属性上，从而限制这些属性的值。所有的注解都位于javax.validation.constraints包中：
+
+| 注解         | 描述                                                         |
+| ------------ | ------------------------------------------------------------ |
+| @AssertFalse | 所注解的元素必须是Boolean类型，并且值为false                 |
+| @AssertTrue  | 所注解的元素必须是Boolean类型，并且值为true                  |
+| @DecimalMax  | 所注解的元素必须是数字，并且它的值要小于或等于给定的BigDecimalString值 |
+| @DecimalMin  | 所注解的元素必须是数字，并且它的值要大于或等于给定的BigDecimalString值 |
+| @Digits      | 所注解的元素必须是数字，并且它的值必须有指定的位数           |
+| @Future      | 所注解的元素的值必须是一个将来的日期                         |
+| @Max         | 所注解的元素必须是数字，并且它的值要小于或等于给定的值       |
+| @Min         | 所注解的元素必须是数字，并且它的值要大于或等于给定的值       |
+| @NotNull     | 所注解元素的值必须不能为null                                 |
+| @Null        | 所注解元素的值必须为null                                     |
+| @Past        | 所注解的元素的值必须是一个已过去的日期                       |
+| @Pattern     | 所注解的元素的值必须匹配给定的正则表达式                     |
+| @Size        | 所注解的元素的值必须是String、集合或数组，并且它的长度要符合给定的范围 |
+
+如下的程序清单展现了Spitter类，它的属性已经添加了校验注解：
+
+```java
+package spittr;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.validator.constraints.Email;
+
+public class Spitter {
+
+    private Long id;
+
+    // Spitter的所有属性都添加了@NotNull注解，以确保它们的值不为null
+    // 属性上也添加了@Size注解以限制它们的长度在最大值和最小值之间
+    @NotNull // 非空
+    @Size(min=5, max=16) // 5-16个字符
+    private String username;
+
+    @NotNull
+    @Size(min=5, max=25)
+    private String password;
+
+    @NotNull
+    @Size(min=2, max=30)
+    private String firstName;
+
+    @NotNull
+    @Size(min=2, max=30)
+    private String lastName;
+
+    @NotNull
+    @Email
+    private String email;
+    ...
+}
+```
+
+接下来需要修改processRegistration()方法来应用校验功能：
+
+```java
+// 校验Spitter输入
+@RequestMapping(value = "/register", method = RequestMethod.POST)
+// Spitter参数添加了@Valid注解，这会告知Spring，需要确保这个对象满足校验限制
+// 如果有校验出现错误的话，那么这些错误可以通过Errors对象进行访问（Errors参数要紧跟在带有@Valid注解的参数后面）
+public String processRegistration(@Valid Spitter spitter, Errors errors) {
+    // 如果校验出现错误，则重新返回表单
+    if (errors.hasErrors()) {
+        return "registerForm";
+    }
+    spitterRepository.save(spitter);
+    return "redirect:/spitter/" + spitter.getUsername();
+}
+```
+
+### 5.5 小结
+
+借助于注解，Spring MVC提供了近似于POJO的开发模式，这使得开发处理请求的控制器变得非常简单，同时也易于测试。
+
+当编写控制器的处理器方法时，Spring MVC极其灵活。概括来讲，如果处理器方法需要内容的话，只需将对应的对象作为参数，而它不需要的内容，则没有必要出现在参数列表中。这样，就为请求处理带来了无限的可能性，同时还能保持一种简单的编程模型。
 
 
 
