@@ -216,6 +216,13 @@ account-service用来封装account-email、account-persist和account-captcha三�
 
 ```
 
+在一些Web项目中，可能会看到finalName元素的配置。该元素用来标识项目生成的主构件的名称，该元素的默认值已在超级POM中设定，值为${project.artifactId}-${project.version}。因此上述代码清单对应的主构件名称为account-web-1.0.0-SNAPSHOT.war，这样的名称显然不利于部署。这时可以如下所示配置finalName元素：
+
+```xml
+<!-- 经此配置后，项目生成的war包名称就会成为account.war，更方便部署 -->
+<finalName>account</finalName>
+```
+
 #### 12.3.2 account-web的主代码
 
 ### 12.4 使用jetty-maven-plugin进行测试
