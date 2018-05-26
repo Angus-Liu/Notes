@@ -14,6 +14,7 @@
 + [第04章_面向切面的Spring](第04章_面向切面的Spring.md)
 + [第05章_构建Spring_Web应用程序](第05章_构建Spring_Web应用程序.md)
 + [第06章_渲染Wen视图](第06章_渲染Wen视图.md)
++ [第07章_Spring_MVC的高级技术](第07章_Spring_MVC的高级技术.md)
 
 
 

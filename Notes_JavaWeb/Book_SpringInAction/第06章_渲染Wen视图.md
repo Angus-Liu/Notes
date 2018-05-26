@@ -354,31 +354,369 @@ public MessageSource messageSource(){
 </s:url>
 ```
 
+创建带有路径（path）参数的URL：
 
+```jsp
+<s:url value="/spitter/{username}" var="registerUrl">
+    <s:param name="username" value="angus"/>
+</s:url>
+```
 
+\<s:url>标签还可以解决URL的转义需求。例如，如果希望将渲染得到的URL内容展现在Web页面上（而不是作为超链接），那么应该要求\<s:url>进行HTML转义，这需要将htmlEscape属性设置为true：
 
+```jsp
+<s:url value="/spitter/register" htmlEscape="true">
+    <s:param name="max" value="60"/>
+    <s:param name="count" value="20"/>
+</s:url>
+```
 
+渲染结果为：
 
+```html
+ /spitter/register?max=60&count=20
+```
 
+如果希望在JavaScript代码中使用URL的话，那么应该将javaScriptEscape属性设置为true：
 
+```jsp
+<s:url value="/spitter/register" var="registerJSUrl" javaScriptEscape="true">
+    <s:param name="max" value="60"/>
+    <s:param name="count" value="20"/>
+</s:url>
+<script>
+    var registerJSUrl = "${registerJSUrl}"
+</script>
+```
 
+这会渲染如下的结果到响应之中：
 
+```html
+<script>
+    var registerJSUrl = "\/spitter\/register?max=60&count=20"
+</script>
+```
 
+**转义内容**
 
+\<s:escapeBody>标签是一个通用的转义标签。它会渲染标签体中内嵌的内容，并且在必要的时候进行转义。
 
+例如，希望在页面上展现一个HTML代码片段。为了正确显示，需要将“<”和“>”字符替换为"`&lt;`"和"`&gt;"`，否则的话，浏览器将会像解析页面上其他HTML那样解析这段HTML内容。
 
+可以使用\<s:escapeBody>，并让Spring完成这项任务：
 
+```jsp
+<s:escapeBody htmlEscape="true">
+    <h1> hello </h1>
+</s:escapeBody>
 
+<%-- 以上的代码将会渲染成如下HTML代码 --%>
+&lt;h1&gt; hello &lt;/h1&gt;
 
+<%-- 通过设置javaScriptEscape属性，<s:escapeBody>标签还支持JavaScript转义 --%>
+<s:escapeBody javaScriptEscape="true">
+    <h1> hello </h1>
+</s:escapeBody>
+```
 
+### 6.3 使用Apache Titles视图定义布局
 
+假设想为应用中的所有页面定义一个通用的头部和底部，比较好的方式是使用布局引擎，如Apache Tiles，定义适用于所有页面的通用页面布局。Spring MVC以视图解析器的形式为Apache Tiles提供了支持，这个视图解析器能够将逻辑视图名解析为Tile定义。
 
+#### 6.3.1 配置Titles视图解析器
 
+为了在Spring中使用Tiles，需要一个TilesConfigurer bean，它会负责定位和加载Tile定义并协调生成Tiles。除此之外，还需要TilesViewResolver bean将逻辑视图名称解析为Tile定义。
 
+TilesConfigurer会加载Tile定义并与Apache Tiles协作， 而TilesViewResolver会将逻辑视图名称解析为引用Tile定义的视图。它是通过查找与逻辑视图名称相匹配的Tile定义实现该功能的。
 
+配置TilesViewResolver 和TilesConfigurer：
 
+```java
+@Bean
+public TilesConfigurer tilesConfigurer(){
+    TilesConfigurer tiles = new TilesConfigurer();
+    // 指定Tile定义的位置
+    // 还可以指定多个Tile定义文件，甚至能够在路径位置上使用通配符
+    // tiles.setDefinitions("/WEB-INF/**/titles.xml"); 
+    // Ant风格的通配符（**），TilesConfigurer会遍历"WEB-INF/"的所有子目录来查找Tile定义
+    tiles.setDefinitions("/WEB-INF/layout/titles.xml"); 
+    tiles.setCheckRefresh(true); // 启用刷新功能
+    return tiles;
+}
 
+@Bean
+public ViewResolver viewResolver(){
+    return new TilesViewResolver(); // 很基本的bean定义，没有什么要设置的属性
+}
+```
 
+也可以按照如下形式在XML中配置TilesConfigurer：
+
+```xml
+<bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+    <property name="definitions">
+        <list>
+            <value>/WEB-INF/layout/tiles.xml</value>
+            <value>/WEB-INF/**/tiles.xml</value>
+        </list>
+    </property>
+</bean>
+
+<bean id="viewResolver" class="org.springframework.web.servlet.view.tiles3.TilesViewResolver" />
+```
+
+**定义Tiles**
+
+Apache Tiles提供了一个文档类型定义（document type definition，DTD），用来在XML文件中指定Tile的定义。每个定义中需要包含一个\<definition>元素，这个元素会有一个或多个\<put-attribute>元素：
+
+```xml
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+    <!-- 每个<definition>元素都定义了一个Tile，它最终引用的是一个JSP模板 -->
+    <!-- 定义base Tile -->
+    <definition name="base" template="/WEB-INF/layout/page.jsp">
+        <!-- 设置属性 -->
+        <!-- 只设置了header和footer，body由扩展自base Tile的Tile设置 -->
+        <put-attribute name="header" value="/WEB-INF/layout/header.jsp"/>
+        <put-attribute name="footer" value="/WEB-INF/layout/footer.jsp"/>
+    </definition>
+
+    <!-- 扩展base Tile -->
+    <!-- 继承base中的模板和所有的属性，单独设置body属性 -->
+    <definition name="home" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/home.jsp"/>
+    </definition>
+
+    <definition name="registerForm" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/registerForm.jsp"/>
+    </definition>
+
+    <definition name="profile" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/profile.jsp"/>
+    </definition>
+
+    <definition name="spittles" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/spittles.jsp"/>
+    </definition>
+
+    <definition name="spittle" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/spittle.jsp"/>
+    </definition>
+
+</tiles-definitions>
+```
+
+base Tile所引用的page.jsp模板如下所示：
+
+```jsp
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="t" %>
+<%@ page session="false" %>
+<html>
+    <head>
+        <title>Spittr</title>
+        <link rel="stylesheet" type="text/css" href="<s:url value="/resources/style.css"/>" >
+    </head>
+    <body>
+        <%-- 插入头部 --%>
+        <div id="header">
+            <%-- 使用Title标签库中<t:insertAttribute>标签来插入其他模板 --%>
+            <t:insertAttribute name="header"/>
+        </div>
+        <%-- 插入主体内容 --%>
+        <div id="content">
+            <t:insertAttribute name="body"/>
+        </div>
+        <%-- 插入底部 --%>
+        <div id="footer">
+            <t:insertAttribute name="footer"/>
+        </div>
+    </body>
+</html>
+```
+
+减去通用元素后，home.jsp也就得以简化：
+
+```jsp
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
+<%@ page session="false" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<h1><s:message code="spitter.welcome"/></h1>
+
+<a href="<s:url value="/spittles" />">Spittles</a> |
+<a href="<s:url value="/spitter/register" />">Register</a>
+```
+
+![1527317835805](assets/1527317835805.png)
+
+### 6.4 使用Thymeleaf
+
+Thymeleaf模板是原生的，不依赖于标签库。它能在接受原始HTML的地方进行编辑和渲染。因为它没有与Servlet规范耦合，因此Thymeleaf模板能够进入JSP所无法涉足的领域。
+
+#### 6.4.1 配置Thymeleaf视图解析器
+
+为了要在Spring中使用Thymeleaf，需要配置三个启用Thymeleaf与Spring集成的bean：
+
++ ThymeleafViewResolver：将逻辑视图名称解析为Thymeleaf模板视图；
++ SpringTemplateEngine：处理模板并渲染结果；
++ TemplateResolver：加载Thymeleaf模板。
+
+使用Java代码的方式，配置Spring对Thymeleaf的支持：
+
+```java
+// Thymeleaf视图解析器
+@Bean
+public ViewResolver viewResolver(SpringTemplateEngine templateEngine){
+    // ThymeleafViewResolver是Spring MVC中ViewResolver的一个实现类，
+    // 像其他的视图解析器一样，它会接受一个逻辑视图名称，并将其解析为视图
+    ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+    // 注入了一个对SpringTemplate Engine bean的引用
+    viewResolver.setTemplateEngine(templateEngine);
+    return viewResolver;
+}
+
+// 模板引擎
+// SpringTemplateEngine会在Spring中启用Thymeleaf引擎，用来解析模板，并基于这些模板渲染结果
+@Bean
+public SpringTemplateEngine templateEngine(TemplateResolver templateResolver){
+    SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+    // 为其注入了一个TemplateResolver bean的引用
+    templateEngine.setTemplateResolver(templateResolver);
+    return templateEngine;
+}
+
+// 模板解析器
+// TemplateResolver会最终定位和查找模板
+@Bean
+public TemplateResolver templateResolver(){
+    TemplateResolver templateResolver = new ServletContextTemplateResolver();
+    // 与之前配置InternalResource-ViewResolver类似，它使用了prefix和suffix属性
+    // 前缀和后缀将会与逻辑视图名组合使用，进而定位Thymeleaf模板
+    templateResolver.setPrefix("/WEB-INF/views/");
+    templateResolver.setSuffix(".html");
+    // templateMode属性被设置成了HTML 5，这表明预期要解析的模板会渲染成HTML5输出
+    templateResolver.setTemplateMode("HTML5");
+    return templateResolver;
+}
+```
+
+使用XML的方式，配置Spring对Thymeleaf的支持：
+
+```xml
+<!-- Thymeleaf视图解析器 -->
+<bean id="viewResolver"
+      class="org.thymeleaf.spring4.view.ThymeleafViewResolver"
+      p:templateEngine-ref="templateEngine"/>
+
+<!-- 模板引擎 -->
+<bean id="templateEngine"
+      class="org.thymeleaf.spring4.SpringTemplateEngine"
+      p:templateResolver-ref="templateResolver"/>
+
+<!-- 模板解析器 -->
+<bean id="templateResolver"
+      class="org.thymeleaf.templateresolver.ServletContextTemplateResolver"
+      p:prefix="/WEB-INF/views"
+      p:suffix=".html"
+      p:templateMode="HTML5"/>
+```
+
+#### 6.4.2 定义Thymeleaf模板
+
+Thymeleaf在很大程度上就是HTML文件，与JSP不同，它没有什么特殊的标签或标签库。Thymeleaf之所以能够发挥作用，是因为它通过自定义的命名空间，为标准的HTML标签集合添加Thymeleaf属性。
+
+使用Thymeleaf命名空间的首页模板引擎（home.html）：
+
+```html
+<!-- 声明Thymeleaf命名空间 -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Spittr</title>
+        <!-- 到样式表的th:href链接 -->
+        <!-- "@{}"表达式，用来计算相对于URL的路径 -->
+        <!-- th:href属性的特殊之处在于它的值中可以包含Thymeleaf表达式，用来计算动态的值 -->
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/style.css}"/>
+    </head>
+    <body>
+        <h1>Welcome to Spittr</h1>
+        <!-- 到页面的th:href链接 -->
+        <a th:href="@{/spittles}">Spittles</a> |
+        <a th:href="@{/spitter/register}">Register</a>
+    </body>
+</html>
+```
+
+**借助Thymeleaf实现表单绑定**
+
+表单绑定是Spring MVC的一项重要特性。它能够将表单提交的数据填充到命令对象中，并将其传递给控制器，而在展现表单的时候，表单中也会填充命令对象中的值。
+
+如下的Thymeleaf模板片段，会渲染First Name输入域：
+
+```html
+<!-- th:class属性会渲染为一个class属性，值是根据给定的表达式计算得到的，会直接检查firstName域，
+     如果有错误，class属性在渲染时的值为error，反之，不渲染class属性-->
+<label th:class="${#fields.hasErrors('firstName')}? 'error'">First Name</label>:
+<!-- th:field属性，用来引用后端对象的firstName域 -->
+<!-- 通过使用th:field和"*{}"表达式，将value属性设置为firstName的值，同时还会将name属性设置为firstName -->
+<input type="text" th:field="*{firstName}"
+       th:class="${#fields.hasErrors('firstName')}? 'error'"/><br/>
+```
+
+完整注册页面，使用Thymeleaf将一个表单绑定到命令对象上：
+
+```html
+<form method="POST" th:object="${spitter}">
+    <!-- 展示错误 -->
+    <!-- <div>元素使用th:if属性来检查是否有校验错误，
+         如果有的话，会渲染<div>，否则的话，它将不会渲染 -->
+    <div class="errors" th:if="${#fields.hasErrors('*')}">
+        <ul>
+            <!-- <li>标签上的th:each属性将会通知Thymeleaf为每项错误都渲染一个<li> -->
+            <!-- th:text属性会通知Thymeleaf计算某一个表达式并将它的值渲染为<li>标签的内容体 -->
+            <li th:each="err : ${#fields.errors('*')}"
+                th:text="${err}">Input is incorrect
+            </li>
+        </ul>
+    </div>
+    <label th:class="${#fields.hasErrors('firstName')}? 'error'">First Name</label>:
+    <input type="text" th:field="*{firstName}"
+           th:class="${#fields.hasErrors('firstName')}? 'error'"/><br/>
+
+    <label th:class="${#fields.hasErrors('lastName')}? 'error'">Last Name</label>:
+    <input type="text" th:field="*{lastName}"
+           th:class="${#fields.hasErrors('lastName')}? 'error'"/><br/>
+
+    <label th:class="${#fields.hasErrors('email')}? 'error'">Email</label>:
+    <input type="text" th:field="*{email}"
+           th:class="${#fields.hasErrors('email')}? 'error'"/><br/>
+
+    <label th:class="${#fields.hasErrors('username')}? 'error'">Username</label>:
+    <input type="text" th:field="*{username}"
+           th:class="${#fields.hasErrors('username')}? 'error'"/><br/>
+
+    <label th:class="${#fields.hasErrors('password')}? 'error'">Password</label>:
+    <input type="password" th:field="*{password}"
+           th:class="${#fields.hasErrors('password')}? 'error'"/><br/>
+    <input type="submit" value="Register"/>
+</form>
+```
+
+**"${}"和"\*{}"表达式区别**
+
+"${}"表达式（如${spitter}）是变量表达式（variable expression）。一般来讲，它们会是对象图导航语言（Object-Graph Navigation Language，OGNL）表达式。但在使用Spring的时候，它们是SpEL表达式。在${spitter}这个例子中，它会解析为key为spitter的model属性。
+
+"\*{}"表达式是选择表达式（selection expression）。变量表达式是基于整个SpEL上下文计算的，而选择表达式是基于某一个选中对象计算的。在本例的表单中，选中对象就是\<form>标签中th:object属性所设置的对象：模型中的Spitter对象。因此，"\*{firstName}"表达式就会计算为Spitter对象的firstName属性。
+
+### 6.5 小结
+
+处理请求只是Spring MVC功能的一部分。如果控制器所产生的结果想要让人看到，那么它们产生的模型数据就要渲染到视图中，并展现到用户的Web浏览器中。Spring的视图渲染是很灵活的，并提供了多个内置的可选方案，包括传统的JavaServer Pages以及流行的Apache Tiles布局引擎。
+
+还可以使用Thymeleaf作为Spring MVC应用的视图层，它被视为JSP的替代方案。Thymeleaf是一项很有吸引力的技术，因为它能创建原始的模板，这些模板是纯HTML，能像静态HTML那样以原始的方式编写和预览，并且能够在运行时渲染动态模型数据。除此之外，Thymeleaf是与Servlet没有耦合关系的，这样它就能够用在JSP所不能使用的领域中。
 
 
 
