@@ -4,7 +4,7 @@
 >
 > 下载链接：<http://readfree.me/book/26767354/> 
 
-![img](assets/s28607882.jpg) 
+![img](assets/book_cover.jpg) 
 
 ## 目录
 
