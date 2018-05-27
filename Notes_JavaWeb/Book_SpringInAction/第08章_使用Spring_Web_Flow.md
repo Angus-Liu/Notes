@@ -256,6 +256,405 @@ Spring Web Flow在选择的表达式语言方面，可以采用对象图导航�
 
 ![1527394001560](assets/1527394001560.png)
 
+订购披萨的整个流程很简单且是线性的，在Spring Web Flow中，表示这个流程很容易：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow 
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+
+    <!-- 每次流程开始时，都会创建一个Order实例，
+         Order类会带有关于订单的所有信息，包含顾客信息、订购的披萨列表以及支付详情-->
+    <!-- 流程变量order将在前三个状态中进行填充并在第四个状态中进行保存 -->
+    <var name="order" class="com.angus.pizza.domain.Order"/>
+
+    <!-- 调用顾客子流程 -->
+    <subflow-state id="identifyCustomer" subflow="pizza/customer">
+        <!-- 使用了<output>元素来填充order的customer属性，将其设置为顾客子流程收到的输出 -->
+        <output name="customer" value="order.customer"/>
+        <transition on="customerReady" to="buildOrder"/>
+    </subflow-state>
+
+    <!-- 调用订单子流程 -->
+    <subflow-state id="buildOrder" subflow="pizza/order">
+        <!-- 使用<input>将order流程变量作为输入，这样子流程就能在其内部填充order对象 -->
+        <input name="order" value="order"/>
+        <transition on="orderCreated" to="takePayment"/>
+    </subflow-state>
+
+    <!-- 调用支付子流程 -->
+    <subflow-state id="takePayment" subflow="pizza/payment">
+        <input name="order" value="order"/>
+        <transition on="paymentTaken" to="saveOrder"/>
+    </subflow-state>
+
+    <!-- 保存订单 -->
+    <action-state id="saveOrder">
+        <!-- 使用<evaluate>来调用ID为pizzaFlowActions的bean的saveOrder()方法，
+             并将待保存的订单对象传递进来 -->
+        <evaluate expression="pizzaFlowActions.saveOrder(order)" />
+        <transition to="thankCustomer" />
+    </action-state>
+
+    <!-- 感谢顾客 -->
+    <!-- thankCustomer状态是一个简单的视图状态，后台使用了"/WEB-INF/flows/pizza/thankCustomer.jsp -->
+    <view-state id="thankCustomer" >
+        <transition to="endState"/>
+    </view-state>
+
+    <end-state id="endState" />
+
+    <!-- 全局取消转移 -->
+    <global-transitions>
+        <transition on="cancel"  to="endState"/>
+    </global-transitions>
+
+</flow>
+```
+
+流程定义的主要组成部分是流程的状态。默认情况下，流程定义文件中的第一个状态也会是流程访问中的第一个状态。在本例中，也就是identifyCustomer状态（一个子流程）。可以通过\<flow>元素的start-state属性将任意状态指定为开始状态：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd"
+      start-state="identifyCustomer">
+    ...
+</flow>
+```
+
+thankCustomer状态是一个简单的视图状态，后台使用了""/WEB-INF/flows/pizza/thankCustomer.jsp"这个JSP文件：
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+    <head>
+        <title>Spizza</title>
+    </head>
+    <body>
+        <h2>Thank you for your order!</h2>
+        <!-- 感谢顾客的订购并为其提供一个完成流程的链接 -->
+        <!-- Spring Web Flow为视图的用户提供了一个flowExecutionUrl变量，它包含了流程的URL
+			结束链接将一个“_eventId”参数关联到URL上，以便回到Web流程时触发finished事件，
+			这个事件将会让流程到达结束状态 -->
+        <a href='${flowExecutionUrl}&_eventId=finished'>Finish</a>
+    </body>
+</html>
+```
+
+#### 8.3.2 收集顾客信息
+
+这个流程比整体的披萨流程更有意思。这个流程不是线性的而是在好几个地方根据不同的条件有了分支：
+
+![1527403297872](assets/1527403297872.png)
+
+识别顾客的流程定义：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+
+    <var name="customer" class="com.angus.pizza.domain.Customer"/>
+	
+    <!-- 欢迎顾客 -->
+    <view-state id="welcome">
+        <transition on="phoneEntered" to="lookupCustomer"/>
+    </view-state>
+
+    <!-- 查找顾客 -->
+    <action-state id="lookupCustomer">
+        <evaluate result="customer" expression="pizzaFlowActions.lookupCustomer(requestParameters.phoneNumber)"/>
+        <transition to="registrationForm" on-exception="com.angus.pizza.service.CustomerNotFoundException"/>
+        <transition to="customerReady"/>
+    </action-state>
+
+    <!-- 注册新顾客-->
+    <view-state id="registrationForm" model="customer">
+        <on-entry>
+            <evaluate expression="customer.phoneNumber = requestParameters.phoneNumber"/>
+        </on-entry>
+        <transition on="submit" to="checkDeliveryArea"/>
+    </view-state>
+
+    <!-- 检查配送区域 -->
+    <decision-state id="checkDeliveryArea">
+        <if test="pizzaFlowActions.checkDeliveryArea(customer.zipCode)"
+            then="addCustomer"
+            else="deliveryWarning"/>
+    </decision-state>
+
+    <!-- 显示配送警告 -->
+    <view-state id="deliveryWarning">
+        <transition on="accept" to="addCustomer"/>
+    </view-state>
+
+    <!-- 添加顾客 -->
+    <action-state id="addCustomer">
+        <evaluate expression="pizzaFlowActions.addCustomer(customer)"/>
+        <transition to="customerReady"/>
+    </action-state>
+
+    <end-state id="cancel"/>
+    <end-state id="customerReady">
+        <output name="customer"/>
+    </end-state>
+
+    <global-transitions>
+        <transition on="cancel" to="cancel"/>
+    </global-transitions>
+</flow>
+```
+
+**询问电话号码**
+
+welcome状态是一个很简单的视图状态，它欢迎访问Spizza站点的顾客并要求他们输入电话号码。定义在“/WEB-INF/flows/ pizza/customer/welcome.jsp”中：
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<html>
+<head><title>Spring Pizza</title></head>
+<body>
+<h2>Welcome to Spring Pizza!!!</h2>
+
+<form:form>
+    <!-- 流程执行的key -->
+    <!-- 隐藏的“_flowExecutionKey”输入域。当进入视图状态时，流程暂停并等待用户采取一些行为，
+         赋予视图的流程执行key（flow execution key）就是一种返回流程的“回程票”（claim ticket），
+         当用户提交表单时，流程执行key会在“_flowExecutionKey”输入域中返回并在流程暂停的位置进行恢复 -->
+    <input type="hidden" name="_flowExecutionKey"
+           value="${flowExecutionKey}"/>
+    <input type="text" name="phoneNumber"/><br/>
+    <!-- 触发phoneEntered事件 -->
+    <!-- 还要注意的是提交按钮的名字，
+         按钮名字的"_eventId_"部分是提供给Spring Web Flow的一个线索，
+         它表明了接下来要触发事件。当点击这个按钮提交表单时，
+         会触发phoneEntered事件进而转移到lookupCustomer -->
+    <input type="submit" name="_eventId_phoneEntered" value="Lookup Customer"/>
+</form:form>
+</body>
+</html>
+```
+
+**查找顾客**
+
+当欢迎表单提交后，顾客的电话号码将包含在请求参数中并准备用于查询顾客。lookupCustomer状态的\<evaluate>元素是查找发生的地方。它将电话号码从请求参数中抽取出来并传递到pizzaFlowActions bean的lookupCustomer()方法中。
+
+lookupCustomer()要么返回Customer对象，要么抛出CustomerNotFoundException异常。
+
+在前一种情况下，Customer对象将会设置到customer变量中（通过result属性）并且默认的转移将把流程带到customerReady状态。但是如果不能找到顾客的话，将抛出CustomerNotFoundException并且流程被转移到registrationForm状态。
+
+**注册新顾客**
+
+registrationForm状态是要求用户填写配送地址的，它将被渲染成JSP：
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<html>
+
+<head><title>Spring Pizza</title></head>
+
+<body>
+<h2>Customer Registration</h2>
+
+<!-- 将表单绑定到Customer对象上 -->
+<form:form commandName="customer">
+    <input type="hidden" name="_flowExecutionKey" value="${flowExecutionKey}"/>
+    <b>Phone number: </b><form:input path="phoneNumber"/><br/>
+    <b>Name: </b><form:input path="name"/><br/>
+    <b>Address: </b><form:input path="address"/><br/>
+    <b>City: </b><form:input path="city"/><br/>
+    <b>State: </b><form:input path="state"/><br/>
+    <b>Zip Code: </b><form:input path="zipCode"/><br/>
+    <input type="submit" name="_eventId_submit" value="Submit"/>
+    <input type="submit" name="_eventId_cancel" value="Cancel"/>
+</form:form>
+</body>
+</html>
+```
+
+**检查配送区域**
+
+决策状态checkDeliveryArea有一个\<if>元素，它将顾客的邮政编码传递到pizzaFlowActions bean的checkDeliveryArea()方法中。这个方法将会返回一个Boolean值：如果顾客在配送区域内则为true，否则为false。
+
+如果顾客在配送区域内的话，那流程转移到addCustomer状态。否则，顾客被带入到deliveryWarning视图状态。deliveryWarning背后的视图就是"/WEB-INF/flows/pizza/customer/deliveryWarning.jsp"：
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<html>
+    <head><title>Spring Pizza</title></head>
+
+    <body>
+        <h2>Delivery Unavailable</h2>
+
+        <p>The address is outside of our delivery area. The order
+            may still be taken for carry-out.</p>
+
+        <!-- 通过使用flowExecurtionUrl变量，这些链接分别触发流程中的accept或cancel事件 -->
+        <a href="${flowExecutionUrl}&_eventId=accept">Accept</a> |
+        <a href="${flowExecutionUrl}&_eventId=cancel">Cancel</a>
+    </body>
+</html>
+```
+
+**存储顾客数据**
+
+当流程抵达addCustomer状态时，用户已经输入了他们的地址。为了将来使用，这个地址需要以某种方式存储起来（可能会存储在数据库中）。addCustomer状态有一个\<evaluate>元素，它会调用pizzaFlowActions bean的addCustomer()方法，并将customer流程参数传递进去。
+
+一旦这个过程完成，会执行默认的转移，流程将会转移到ID为customerReady的结束状态。
+
+**结束流程**
+
+这个流程中，有两个结束状态。当子流程完成时，它会触发一个与结束状态ID相同的流程事件。
+
+当customer流程走完所有正常的路径后，它最终会到达ID为customerReady的结束状态。当调用它的披萨流程恢复时，它会接收到一个customerReady事件，这个事件将使得流程转移到buildOrder状态。
+
+customerReady结束状态包含了一个\<output>元素。在流程中这个元素等同于Java中的return语句。它从子流程中传递一些数据到调用流程。
+
+另一方面，如果在任意地方触发了cancel事件，将会通过ID为cancel的结束状态退出流程，这也会在披萨流程中触发cancel事件并导致转移（通过全局转移）到披萨流程的结束状态。
+
+#### 8.3.3 构建订单
+
+在识别完顾客之后，主流程的下一件事情就是确定他们想要什么类型的披萨。订单子流程就是用于提示用户创建披萨并将其放入订单中的：
+
+![1527406954446](assets/1527406954446.png)
+
+订单子流程的视图状态，用于展示订单和添加披萨：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow 
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+
+    <!-- 接收order作为输入 -->
+    <input name="order" required="true"/>
+
+    <!-- 展现order的视图状态 -->
+    <view-state id="showOrder">
+        <transition on="createPizza" to="createPizza"/>
+        <transition on="checkout" to="orderCreated"/>
+        <transition on="cancel" to="cancel"/>
+    </view-state>
+
+    <!-- 创建pizza的视图状态 -->
+    <view-state id="createPizza" model="flowScope.pizza">
+        <!-- <on-entry>元素添加了一个新的Pizza对象到流程作用域内，
+        当表单提交时，表单的内容会填充到该对象中 -->
+        <on-entry>
+            <set name="flowScope.pizza" value="new com.angus.pizza.domain.Pizza()"/>
+            <evaluate result="viewScope.toppingList" expression="T(com.angus.pizza.domain.Topping).asList()"/>
+        </on-entry>
+        <transition on="addPizza" to="showOrder">
+            <evaluate expression="order.addPizza(flowScope.pizza)"/>
+        </transition>
+        <transition on="cancel" to="showOrder"/>
+    </view-state>
+
+    <!-- 取消的结束状态 -->
+    <end-state id="cancel"/>
+    <!-- 创建订单的结束状态 -->
+    <end-state id="orderCreated"/>
+</flow>
+```
+
+通过将流程作用域的对象绑定到HTML表单，实现添加披萨到订单中：
+
+```jsp
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<div>
+    <h2>Create Pizza</h2>
+    <form:form commandName="pizza">
+        <input type="hidden" name="_flowExecutionKey" value="${flowExecutionKey}"/>
+
+        <b>Size: </b><br/>
+        <form:radiobutton path="size" label="Small (12-inch)" value="SMALL"/><br/>
+        <form:radiobutton path="size" label="Medium (14-inch)" value="MEDIUM"/><br/>
+        <form:radiobutton path="size" label="Large (16-inch)" value="LARGE"/><br/>
+        <form:radiobutton path="size" label="Ginormous (20-inch)" value="GINORMOUS"/><br/>
+        <br/>
+
+        <b>Toppings: </b><br/>
+        <form:checkboxes path="toppings" items="${toppingsList}" delimiter="<br/>"/><br/><br/>
+
+        <!-- 通过Continue按钮提交订单时，size和toppings会绑定到Pizza对象中并且触发addPizza转移 -->
+        <input type="submit" class="button" name="_eventId_addPizza" value="Continue"/>
+        <input type="submit" class="button" name="_eventId_cancel" value="Cancel"/>
+    </form:form>
+</div>
+
+```
+
+#### 8.3.4 支付
+
+最后的子流程提示用户输入他们的支付信息。这个简单的流程如图所示：
+
+![1527409113459](assets/1527409113459.png)
+
+使用XML定义的支付流程如下所示：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+
+    <input name="order" required="true"/>
+
+    <view-state id="takePayment" model="flowScope.paymentDetails">
+        <on-entry>
+            <!-- <on-entry>元素将构建一个支付表单并使用SpEL表达式在流程作用域内
+             创建一个PaymentDetails实例，这是支撑表单的对象 -->
+            <set name="flowScope.paymentDetails" value="new com.angus.pizza.domain.PaymentDetails()"/>
+            <!-- 也会创建视图作用域的paymentTypeList变量，
+                 这个变量是一个列表包含了PaymentType枚举的值，
+                 在这里，SpEL的T()操作用于获得PaymentType类，这样就可以调用静态的asList()方法 -->
+            <evaluate result="viewScope.paymentTypeList" expression="T(com.angus.pizza.domain.PaymentType).asList()"/>
+        </on-entry>
+        <transition on="paymentSubmitted" to="verifyPayment"/>
+        <transition on="cancel" to="cancel"/>
+    </view-state>
+
+    <action-state id="verifyPayment">
+        <evaluate result="order.payment" expression="pizzaFlowActions.verifyPayment(flowScope.paymentDetails)"/>
+        <transition to="paymentTaken"/>
+    </action-state>
+
+    <!-- <end-state>的id将决定主流程中接下来的转移 -->
+    <end-state id="cancel"/>
+    <end-state id="paymentTaken"/>
+</flow>
+```
+
+### 8.4 保护Web流程
+
+Spring Web Flow中的状态、转移甚至整个流程都可以借助\<secured>元素实现安全性，该元素会作为这些元素的子元素。例如，为了保护对一个视图状态的访问，可以这样使用\<secured>：
+
+```xml
+<!-- 按照这里的配置，只有授予ROLE_ADMIN访问权限（借助attributes属性）的用户才能访问这个视图状态 -->
+<view-state id="restricted">
+    <!-- attributes属性使用逗号分隔的权限列表来表明用户要访问指定状态、转移或流程所需要的权限 -->
+    <!-- match属性可以设置为any或all
+         如果设置为any，那么用户必须至少具有一个attributes属性所列的权限
+         如果设置为all，那么用户必须具有所有的权限 -->
+    <secured attributes="ROLE_ADMIN" match="all"/>
+</view-state>
+```
+
+### 8.5 小结
+
+Spring Web Flow，它是能够构建基于流程的会话式应用程序的Web框架。流程由多个状态和转移组成，它们定义了会话如何从一个状态到另一个状态。状态本身分为好多种：行为状态执行业务逻辑，视图状态涉及到流程中的用户，决策状态动态地引导流程执行，结束状态表明流程的结束，除此之外，还有子流程状态，它们自身是通过流程来定义的。
+
+
+
 
 
 
