@@ -387,6 +387,260 @@ public interface Part {
 
 ### 7.3 处理异常
 
+Spring提供了多种方式将异常转换为响应：
+
++ 特定的Spring异常会自动映射为指定的HTTP状态码；
++ 异常上可以添加@ResponseStatus注解，从而将其映射为某一个HTTP状态码；
++ 在方法上可以添加@ExceptionHandler注解，使其用来处理异常。
+
+#### 7.3.1 将异常映射为HTTP状态码
+
+在默认情况下，Spring会将自身的一些异常自动转换为合适的状态码：
+
+| Spring异常                              | HTTP状态码                   |
+| --------------------------------------- | ---------------------------- |
+| BindException                           | 400 - Bad Request            |
+| ConversionNotSupportedException         | 500 - Internal Server Error  |
+| HttpMediaTypeNotAcceptableException     | 406 - Not Acceptable         |
+| HttpMediaTypeNotSupportedException      | 415 - Unsupported Media Type |
+| HttpMessageNotReadableException         | 400 - Bad Request            |
+| HttpMessageNotWritableException         | 500 - Internal Server Error  |
+| HttpRequestMethodNotSupportedException  | 405 - Method Not Allowed     |
+| MethodArgumentNotValidException         | 400 - Bad Request            |
+| MissingServletRequestParameterException | 400 - Bad Request            |
+| MissingServletRequestPartException      | 400 - Bad Request            |
+| NoSuchRequestHandlingMethodException    | 404 - Not Found              |
+| TypeMismatchException                   | 400 - Bad Request            |
+
+异常一般会由Spring自身抛出，作为DispatcherServlet处理过程中或执行校验时出现问题的结果。例如，如果DispatcherServlet无法找到适合处理请求的控制器方法，那么将会抛出NoSuchRequestHandlingMethodException异常，最终的结果就是产生404状态码的响应（Not Found）。
+
+而对于应用所抛出的异常，Spring提供了一种机制，能够通过@ResponseStatus注解将异常映射为HTTP状态码。
+
+例如，SpittleController中如下的请求处理方法，它可能会产生HTTP 404状态（但目前还没有实现）：
+
+```java
+@RequestMapping(value = "/{spittleId}", method = RequestMethod.GET)
+public String spittle(@PathVariable(value = "spittleId") long spittleId, Model model) {
+    // 从SpittleRepository中，通过ID检索Spittle对象
+    Spittle spittle = spittleRepository.findOne(spittleId);
+    // 如果findOne()方法返回null的话，那么将会抛出SpittleNotFoundException异常
+    if (spittle == null) {
+        throw new SpittleNotFoundException();
+    }
+    model.addAttribute(spittle);
+    return "spittle";
+}
+```
+
+SpittleNotFoundException就是一个简单的运行时异常：
+
+```java
+package spittr.web;
+
+public class SpittleNotFoundException extends RuntimeException {
+}
+```
+
+如果调用spittle()方法来处理请求，并且给定ID获取到的结果为空，那么SpittleNotFoundException（默认）将会产生500状态码（Internal Server Error）的响应。可以通过映射SpittleNotFoundException对这种默认行为进行变更。
+
+当抛出SpittleNotFoundException异常时，这是一种请求资源没有找到的场景。如果资源没有找到的话，HTTP状态码404是最为精确的响应状态码。所以，要使用@ResponseStatus注解将SpittleNotFoundException映射为HTTP状态码404：
+
+```java
+package spittr.web;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+// 将异常映射为HTTP状态码404，原因是"Spittle Not Found"
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Spittle Not Found")
+public class SpittleNotFoundException extends RuntimeException {
+}
+```
+
+#### 7.3.2 编写异常处理的方法
+
+如果想在响应中不仅要包括状态码，还要包含所产生的错误。此时，就不能将异常视为HTTP错误了，而是要按照处理请求的方式来处理异常。
+
+假设用户试图创建的Spittle与已创建的Spittle文本完全相同，那么SpittleRepository的save()方法将会抛出DuplicateSpittleException异常。这意味着SpittleController的saveSpittle()方法可能需要处理这个异常：
+
+```java
+@RequestMapping(method=RequestMethod.POST)
+public String saveSpittle(SpittleForm form, Model model) {
+    try {
+        spittleRepository.save(
+            new Spittle(null, form.getMessage(), new Date(), 
+                        form.getLongitude(), form.getLatitude()));
+        return "redirect:/spittles";
+    } catch (DuplicateSpittleException e) { // 捕获异常
+        return "error/duplicate";
+    }
+}
+```
+
+但是这个方法有些复杂。如果能让saveSpittle()方法只关注正确的路径，而让其他方法处理异常的话，那么它就能简单一些。
+
+首先，将saveSpittle()方法中的异常处理方法剥离掉：
+
+```java
+// saveSpittle()方法简单了许多，因为它只关注成功保存Spittle的情况，
+// 所以只有一个执行路径，很容易理解（和测试）
+@RequestMapping(method=RequestMethod.POST)
+public String saveSpittle(SpittleForm form, Model model) {
+    spittleRepository.save(
+        new Spittle(null, form.getMessage(), new Date(), 
+                    form.getLongitude(), form.getLatitude()));
+    return "redirect:/spittles";
+}
+```
+
+其次，为SpittleController添加一个新的方法，它会处理抛出DuplicateSpittleException的情况：
+
+```java
+// 添加了@ExceptionHandler注解，
+// 当抛出DuplicateSpittleException异常的时候，将会委托该方法来处理
+// 对于@ExceptionHandler注解标注的方法来说，它能处理同一个控制器中所有处理器方法所抛出的异常
+@ExceptionHandler(DuplicateSpittleException.class)
+public String handleNotFound(){
+    // 返回的是一个String，这与处理请求的方法是一致的，
+    // 指定了要渲染的逻辑视图名，它能够告诉用户他正在试图创建一条重复的条目
+    return "error/duplicate";  
+}
+```
+
+### 7.4 为控制器添加通知
+
+如果要在多个控制器中处理异常，那@ExceptionHandler注解所标注的方法是很有用的。不过为了避免重复，可以创建一个基础的控制器类，所有控制器类要扩展这个类，从而继承通用的@ExceptionHandler方法。
+
+Spring 3.2为这类问题引入了一个新的解决方案：控制器通知。控制器通知（controller advice）是任意带有@ControllerAdvice注解的类，这个类会包含一个或多个如下类型的方法：
+
++ @ExceptionHandler注解标注的方法；
++ @InitBinder注解标注的方法；
++ @ModelAttribute注解标注的方法。
+
+在带有@ControllerAdvice注解的类中，以上所述的这些方法会运用到整个应用程序所有控制器中带有@RequestMapping注解的方法上。@ControllerAdvice注解本身已经使用了@Component，因此@ControllerAdvice注解所标注的类将会自动被组件扫描获取到。
+
+@ControllerAdvice最为实用的一个场景就是将所有的@ExceptionHandler方法收集到一个类中，这样所有控制器的异常就能在一个地方进行一致的处理：
+
+```java
+package spittr.web;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+// 定义控制器通知类
+@ControllerAdvice 
+public class AppWideExceptionHandler {
+
+    // 定义异常处理方法
+    // 现在，任意的控制器方法抛出了DuplicateSpittleException，
+    // 都会调用这个duplicateSpittleHandler()方法来处理异常
+    @ExceptionHandler(DuplicateSpittleException.class)
+    public String duplicateSpittle(){
+        // 返回"error/duplicate"作为逻辑视图名，将会被渲染为一个自定义的错误页面
+        return "error/duplicate";
+    }
+}
+```
+
+### 7.5 跨重定向请求传递数据
+
+在控制器方法返回的视图名称中，借助了“redirect:”前缀来实现重定向。当控制器方法返回的String值以"redirect:"开头的话，那么这个String不是用来查找视图的，而是用来指导浏览器进行重定向的路径。
+
+对于重定向来说，模型并不能用来传递数据（在新的请求属性中，没有任何的模型数据，这个请求必须要自己计算数据。）。但是也有一些其他方案，能够从发起重定向的方法传递数据给处理重定向方法中：
+
++ 使用URL模板以路径变量和/或查询参数的形式传递数据；
++ 通过flash属性发送数据。
+
+#### 7.5.1 通过URL模板进行重定向
+
+通过路径变量和查询参数传递数据看起来非常简单。但是，当构建URL或SQL查询语句的时候，使用String连接是很危险的。
+
+```java
+return "redirect:/spitter/" + spitter.getUsername();
+```
+
+除了连接String的方式来构建重定向URL，Spring还提供了使用模板的方式来定义重定向URL。
+
+```java
+@RequestMapping(value = "/register", method = RequestMethod.POST)
+public String processRegistration(Model model, Spitter spitter) throws IOException {
+    spitterRepository.save(spitter);
+    model.addAttribute("username", spitter.getUsername());
+    // username作为占位符填充到了URL模板中，而不是直接连接到重定向String中，
+    // 所以username中所有的不安全字符都会进行转义
+    return "redirect:/spitter/{username}";
+}
+```
+
+除此之外，模型中所有其他的原始类型值都可以添加到URL中作为查询参数：
+
+```java
+@RequestMapping(value = "/register", method = RequestMethod.POST)
+public String processRegistration(Model model, Spitter spitter) throws IOException {
+    spitterRepository.save(spitter);
+    model.addAttribute("username", spitter.getUsername());
+    // 因为模型中的spitterId属性没有匹配重定向URL中的任何占位符，
+    // 所以它会自动以查询参数的形式附加到重定向URL上
+    // 最后的到的结果类似"/spitter/angus?spitterId=42"
+    model.addAttribute("spittleId", spitter.getId());
+    return "redirect:/spitter/{username}";
+}
+```
+
+#### 7.5.2 使用flash属性
+
+假设要发送实际的Spitter对象，正如之前所说，模型数据最终是以请求参数的形式复制到请求中的，当重定向发生的时候，这些数据就会丢失。因此，需要将Spitter对象放到一个位置，使其能够在重定向的过程中存活下来。
+
+Spring认为将跨重定向存活的数据放到会话中是一个很不错的方式。并且，Spring认为并不需要管理这些数据，它提供了将数据发送为flash属性（flash attribute）的功能。按照定义，flash属性会一直携带这些数据直到下一次请求，然后才会消失。
+
+Spring提供了通过RedirectAttributes设置flash属性的方法，这是Spring 3.1引入的Model的一个子接口。RedirectAttributes提供了Model的所有功能，除此之外，还有几个方法是用来设置flash属性的。
+
+```java
+@RequestMapping(value = "/register", method = RequestMethod.POST)
+public String processRegistration(Spitter spitter, RedirectAttributes model) throws IOException {
+    spitterRepository.save(spitter);
+    model.addAttribute("username", spitter.getUsername());
+    // 调用RedirectAttributes的addFlashAttribute()方法，将spittr作为key，Spittr对象作为值，
+    // 也可以不设置key参数，让key根据值的类型自行推断得出（这里会推断为"spittr"）
+    model.addFlashAttribute("spittr", spitter);
+    return "redirect:/spitter/{username}";
+}
+```
+
+在重定向执行之前，所有的flash属性都会复制到会话（Session）中。在重定向后，存在会话中的flash属性会被取出，并从会话转移到模型之中。处理重定向的方法就能从模型中访问Spitter对象了，就像获取其他的模型对象一样。
+
+![1527384667234](assets/1527384667234.png)
+
+为了完成flash属性的流程，如下展现了更新版本的showSpitterProfile()方法，在从数据库中查找之前，它会首先从模型中检查Spitter对象：
+
+```java
+@RequestMapping(value = "/{username}", method = RequestMethod.GET)
+public String showSpitterProfile(@PathVariable String username, Model model) {
+    // 检查是否存有key为spitter的model属性
+    if (!model.containsAttribute("spittr")) {
+        // 如果模型中不包含spitter属性的话，
+        // 那么showSpitterProfile()才会从Repository中查找Spitter，并将其存放到模型中
+        Spitter spitter = spitterRepository.findByUsername(username);
+        model.addAttribute(spitter);
+    }
+    return "profile";
+}
+```
+
+### 7.6 小结
+
+Spring MVC的环境搭建有多种可选方案。在本章中，首先介绍了搭建Spring MVC中DispatcherServlet和ContextLoaderListener的多种方式。还了解了如何调整DispatcherServlet的注册功能以及如何注册自定义的Servlet和Filter。如果需要将应用部署到更老的应用服务器上，本章还介绍了如何使用web.xml声明DispatcherServlet和ContextLoaderListener。
+
+然后，介绍了如何处理Spring MVC控制器所抛出的异常，可以将异常处理的代码抽取到单独的方法中。为了采用一致的方式处理通用的任务，包括在应用的所有控制器中处理异常，Spring 3.2引入了@ControllerAdvice，它所创建的类能够将控制器的通用行为抽取到同一个地方。
+
+最后，是如何跨重定向传递数据，包括Spring对flash属性（类似于模型的属性）的支持，其能在重定向后存活下来。这样的话，就能采用非常恰当的方式为POST请求执行一个重定向回应，而且能够将处理POST请求时的模型数据传递过来，然后在重定向后使用或展现这些模型数据。
+
+
+
+
+
+
+
+
+
 
 
 
