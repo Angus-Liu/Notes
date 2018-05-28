@@ -596,9 +596,273 @@ Spring Security通过一个同步token的方式来实现CSRF防护的功能。�
 <input type="hidden" name="${_csrf.parameterName}" value="_csrf.token"/>
 ```
 
-更好的功能是，如果使用Spring的表单绑定标签的话，<sf:form>标签会自动为我们添加隐藏的CSRF token标签。
+更好的功能是，如果使用Spring的表单绑定标签的话，\<sf:form>标签会自动为我们添加隐藏的CSRF token标签。
 
-处理CSRF的另外一种方式就是根本不去处理它。我们可以在配置中通过调用csrf().disable()禁用Spring Security的CSRF防护功能，如下所示：
+处理CSRF的另外一种方式就是根本不去处理它。可以在配置中通过调用csrf().disable()禁用Spring Security的CSRF防护功能，如下：
+
+```java
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        ...
+        .csrf()
+        // 禁用CSRF防护功能
+        // CSRF功能被禁用，应用会面临风险
+        .disable(); 
+}
+```
+
+### 9.4 认证用户
+
+一旦重写了configure(HttpSecurity)方法，就失去了Spring Security默认的简单登录页面。需要找回该功能时，所需要做的就是在configure(HttpSecurity)方法中，调用formLogin()方法。
+
+```java
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        .formLogin() // 启用默认的登录页
+        .and()
+        .authorizeRequests()
+        .antMatchers("/spitters/me").hasRole("SPITTER")
+        .antMatchers(HttpMethod.POST, "/spittles").hasRole("SPITTER")
+        .anyRequest().permitAll()
+        .and()
+        .requiresChannel()
+        .antMatchers("/spitter/form").requiresSecure();
+}
+```
+
+![1527474197831](assets/1527474197831.png)
+
+#### 9.4.1 添加自定义的登录页
+
+Spring Security默认登录页面的HTML源码：
+
+```html
+<html>
+    <head>
+        <title>Login Page</title>
+    </head>
+    <body onload='document.f.username.focus();'>
+        <h3>Login with Username and Password</h3>
+        <!-- <from>d的action属性是一个关键属性，指明了提交到的地方"/login"（相对于上下文地址） -->
+        <form name='f' action='/login' method='POST'>
+            <table>
+                <!-- 在自定义的登陆页面中，也需要username和password输入域 -->
+                <tr>
+                    <td>User:</td><td><input type='text' name='username' value=''></td>
+                </tr>
+                <tr>
+                    <td>Password:</td><td><input type='password' name='password'/></td>
+                </tr>
+                <tr>
+                    <td colspan='2'><input name="submit" type="submit" value="Login"/></td>
+                </tr>
+                <!-- 假设没有禁用CSRF，还需要保证包含了CSRF token的"_csrf"输入域 -->
+                <input name="_csrf" type="hidden" value="a8a8bf0b-443c-48d2-8bee-e72e57b50e53" />
+            </table>
+        </form>
+    </body>
+</html>
+```
+
+为Spittr应用编写的自定义登录页（以Thymeleaf模板的形式）：
+
+```html
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Spitter</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/style.css}" />
+    </head>
+    <body onload='document.f.username.focus();'>
+        <div id="header" th:include="page :: header"></div>
+        <div id="content">
+            <a th:href="@{/spitter/register}">Register</a>
+            <!-- 提交到"/login" -->
+            <!-- 因为这是一个Thymeleaf模板，因此隐藏的“_csrf”域将会自动添加到表单中 -->
+            <form name='f' th:action='@{/login}' method='POST'>
+                <table>
+                    <!-- 包含了username和password输入域，就像默认的登录页一样 -->
+                    <tr>
+                        <td>User:</td><td><input type='text' name='username' value=''/></td>
+                    </tr>
+                    <tr>
+                        <td>Password:</td><td><input type='password' name='password'/></td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'>
+                            <input id="remember_me" name="remember-me" type="checkbox"/>
+                            <label for="remember_me" class="inline">Remember me</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='2'>
+                            <input name="submit" type="submit" value="Login"/>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div id="footer" th:include="page :: copy"></div>
+    </body>
+</html>
+
+```
+
+#### 9.4.2 启用HTTP Basic认证
+
+当应用程序的使用者是另外一个应用程序的话，使用表单来提示登录的方式就不太适合了。HTTP Basic认证（HTTP Basic Authentication）会直接通过HTTP请求本身，对要访问应用程序的用户进行认证。本质上，这是一个HTTP 401响应，表明必须要在请求中包含一个用户名和密码。在REST客户端向它使用的服务进行认证的场景中，这种方式比较适合。
+
+如果要启用HTTP Basic认证的话，只需在configure()方法所传入的HttpSecurity对象上调用httpBasic()即可。另外，还可以通过调用realmName()方法指定域：
+
+```java
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        .formLogin()
+        .loginPage("/login")
+        .and()
+        .httpBasic()
+        .realmName("Spitter")
+        ...
+}
+```
+
+#### 9.4.3 启用Remember-me功能
+
+许多站点提供了Remember-me功能，只要登录过一次，应用就会记住，当再次回到应用的时候就不需要登录了。
+
+Spring Security使得为应用添加Remember-me功能变得非常容易。为了启用这项功能，只需在configure()方法所传入的HttpSecurity对象上调用rememberMe()即可：
+
+```java
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        .formLogin()
+            .loginPage("/login")
+        .and()
+        // 启用Remember-me功能
+        .rememberMe()
+            // 默认情况下，这个功能是通过在cookie中存储一个token完成的，
+            // 这个token最多两周内有效，可以通过tokenValiditySeconds()方法自定义
+            .tokenValiditySeconds(2519200)
+            // 存储在cookie中的token包含用户名、密码、过期时间和一个私钥，
+            // 在写入cookie前都进行了MD5哈希；
+            // 默认情况下，私钥的名为SpringSecured，
+            // 但在这里将其设置为spitterKey，使它专门用于Spittr应用。
+            .key("spitterKey")
+        ...
+}
+```
+
+Remember-me功能已经启用，需要有一种方式来让用户表明他们希望应用程序能够记住他们。为了实现这一点，登录请求必须包含一个名为remember-me的参数。在登录表单中，增加一个简单复选框就可以完成这件事情：
+
+```html
+<input id="remember_me" name="remember-me" type="checkbox"/>
+<label for="remember_me" class="inline">Remember me</label></td></tr>
+```
+
+#### 9.4.4 退出
+
+退出功能是通过Servlet容器中的Filter实现的（默认情况下），这个Filter会拦截针对“/logout”的请求。因此，为应用添加退出功能只需添加如下的链接即可（如下以Thymeleaf代码片段的形式进行了展现）：
+
+```html
+<!-- 当用户点击这个链接的时候，会发起对“/logout”的请求，
+     这个请求会被Spring Security的LogoutFilter所处理 -->
+<a th:href="@{/logout}">Logout</a>
+```
+
+用户会退出应用，所有的Remember-me token都会被清除掉。在退出完成后，用户浏览器将会重定向到“/login?logout”，从而允许用户进行再次登录。如果希望用户被重定向到其他的页面，那么可以在configure()中进行如下的配置：
+
+```java
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        .formLogin()
+        .loginPage("/login")
+        .and()
+        // logout()提供了配置退出行为的方法
+        .logout()
+        // 调用logoutSuccessUrl()表明在退出成功之后，浏览器需要重定向到"/"
+        .logoutSuccessUrl("/")
+        ...
+}
+```
+
+### 9.5 保护视图
+
+保护视图即是通过安全限制和相关的信息，根据用户的权限，有条件的渲染视图。
+
+#### 9.5.1 使用Spring Security有的JSP标签库
+
+Spring Security通过JSP标签库在视图层上支持安全性：
+
+| JSP标签                       | 作用                                                         |
+| ----------------------------- | ------------------------------------------------------------ |
+| \<security:accesscontrollist> | 如果用户通过访问控制列表授予了指定的权限，那么渲染该标签体中的内容 |
+| \<security:authentication>    | 渲染当前用户认证对象的详细信息                               |
+| \<security:authorize>         | 如果用户被授予了特定的权限或者SpEL表达式的计算结果为true，那么渲染该标签体中的内容 |
+
+为了使用JSP标签库，需要在对应的JSP中声明它：
+
+```jsp
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security"%>
+```
+
+**访问认证信息的细节**
+
+借助Spring Security JSP标签库，所能做到的最简单的一件事情就是便利地访问用户的认证信息。例如，对于Web站点来讲，在页面顶部以用户名标示显示“欢迎”或“您好”信息是很常见的。这恰恰是\<security:authentication>所做的事情：
+
+```jsp
+<%-- 渲染的是principal属性中嵌套的username属性 --%>
+Hello <security:authentication property="principal.username" />!
+```
+
+property用来标示用户认证对象的一个属性。可用的属性取决于用户认证的方式。在不同的认证方式下，有几个通用的属性：
+
+| 认证属性    | 描述                                             |
+| ----------- | ------------------------------------------------ |
+| authorities | 一组用于表示用户所授予权限的GrantedAuthority对象 |
+| Credentials | 用于核实用户的凭证（通常，这会是用户的密码）     |
+| details     | 认证的附加信息（IP地址、证件序列号、会话ID等）   |
+| principal   | 用户的基本信息对象                               |
+
+\<security:authentication>将在视图中渲染属性的值，也可以将其赋值给一个变量，只需要在var属性中指明变量的名字即可：
+
+```jsp
+<%-- 指明将属性设置给loginId的属性 --%>
+<security:authentication property="principal.username" var="loginId"/>
+
+<%-- 变量默认是定义在页面作用域内的，可以通过scope属性设置其作用域 --%>
+<security:authentication property="principal.username" var="loginId" scope="request"/>
+```
+
+**条件性的渲染内容**
+
+Spring Security的\<security:authorize>JSP标签能够根据用户被授予的权限有条件地渲染页面的部分内容。例如，在Spittr应用中，对于没有ROLE_SPITTER角色的用户，不会为其显示添加新Spittle记录的表单：
+
+```jsp
+<%-- 只有在具有ROLE_SPITTER权限时才会渲染表单 --%>
+<%-- access属性被赋值为一个SpEL表达式，
+     这个表达式的值将确定<security: authorize>标签主体内的内容是否渲染 --%>
+<security:authorize access="hasRole('ROLE_SPITTER')">
+    <s:url value="/spittles" var="spittlr_url"/>
+    <sf:form modelAttribute="spittle" action="${spittlr_url}">
+        <sf:label path="text">
+            <s:message code="label.spittle" text="Enter spittle"/>
+        </sf:label>
+        <sf:textarea path="text" rows="2" clos="40"/>
+        <sf:errors path="text"/>
+        <br/>
+        <div class="spitItSubmitIt">
+            <input type="submit" value="Spit it!" class="status-btn round-btn disabled">
+        </div>
+    </sf:form>
+</security:authorize>
+```
+
+借助Spring Security所提供的SpEL表达式
 
 
 
