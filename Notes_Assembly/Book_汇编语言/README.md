@@ -1,6 +1,6 @@
 ## Spring In Action
 
-> 记录学习**Assembly（汇编语言）**的历程，辅助**微机原理**学科的学习，参考自书籍[《汇编语言（第2版）》](https://book.douban.com/subject/3037562/)。[整理自原学习笔记]
+> 记录学习**Assembly（汇编语言）**的历程，辅助**微机原理**学科的学习，参考自书籍[《汇编语言（第2版）》](https://book.douban.com/subject/3037562/)。【整理自原学习笔记】
 >
 > 下载链接：<http://readfree.me/book/3037562/> 
 
