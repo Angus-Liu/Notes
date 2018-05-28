@@ -862,13 +862,94 @@ Spring Security的\<security:authorize>JSP标签能够根据用户被授予的�
 </security:authorize>
 ```
 
-借助Spring Security所提供的SpEL表达式
+借助Spring Security所提供的SpEL表达式，可以构造出非常有意思的安全性约束。假设应用中有一些管理功能只能对用户名为Angus的用户可用，那可以这样使用isAuthenticated()和principal表达式：
 
+```jsp
+<security:authorize access="isAuthenticated() and principal.username='Angus'">
+    <a href="/admin">Administration</a>
+</security:authorize>
+```
 
+当然虽然视图不会渲染这个链接，但是还要防止用户手动输入，所以需要在安全配置中，添加限制：
 
+```java
+.authorizeRequests()
+    .antMatchers("/admin")
+    .access("isAuthenticated() and principal.username='Angus'")
+```
 
+不过以上两个地方的配置可以简化（去掉重复配置），这是\<security:authorize>的url属性所要做的事情。它不像access属性那样明确声明安全性限制，url属性对一个给定的URL模式会间接引用其安全性约束。假设已经在Spring Security配置中为“/admin”声明了安全性约束，所以可以这样使用url属性：
 
+```jsp
+<%-- 只在一个地方配置了表达式（安全配置中），但是在两个地方进行了应用 --%>
+<%-- 只有基本信息中用户名为"Angus"的已认证用户才能访问"/admin" URL，
+     所以只有满足以上条件，<security:authorize>标签主体中的内容才会被渲染 --%>
+<security:authorize url="/admin">
+    <s:url value="/admin" var="admin_url" />
+    <a href="${admin_url}"/>
+</security:authorize>
+```
 
+#### 9.5.2 使用Thymeleaf的Spring Security方言
+
+与Spring Security的JSP标签库类似，Thymeleaf的安全方言提供了条件化渲染和显示认证细节的能力：
+
+| 属性               | 作用                                                         |
+| ------------------ | ------------------------------------------------------------ |
+| sec:authentication | 渲染认证对象的属性。类似于Spring Security的\<sec:authentication/>JSP标签 |
+| sec:authorize      | 基于表达式的计算结果，条件性的渲染内容。类似于Spring Security的\<sec:authorize/>JSP标签 |
+| sec:authorize-acl  | 基于表达式的计算结果，条件性的渲染内容。类似于Spring Security的\<sec:accesscontrollist/> JSP标签 |
+| sec:authorize-expr | sec:authorize属性的别名                                      |
+| sec:authorize-url  | 基于给定URL路径相关的安全规则，条件性的渲染内容。类似于Spring Security的\<sec:authorize/> JSP标签使用url属性时的场景 |
+
+为了使用安全方言，需要确保Thymeleaf Extras Spring Security已经位于应用的类路径下。然后，还需要在配置中使用SpringTemplateEngine来注册SpringSecurity Dialect。一下程序所展现的@Bean方法声明了SpringTemplateEngine bean，其中就包含了SpringSecurityDialect：
+
+```java
+@Bean
+public SpringTemplateEngine templateEngine(TemplateResolver templateResolver){
+    SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+    templateEngine.setTemplateResolver(templateResolver);
+    templateEngine.addDialect(new SpringSecurityDialect());
+    return templateEngine;
+}
+```
+
+安全方言注册完成之后，就可以在Thymeleaf模板中使用它的属性了。首先，需要在使用这些属性的模板中声明安全命名空间：
+
+```html
+<!-- 安全方言则设置为使用sec前缀 -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    ...
+</html>
+```
+
+假设我要为认证用户渲染"Hello"文本。如下的Thymeleaf模板代码片段就能完成这项任务：
+
+```html
+<!-- sec:authorize属性会接受一个SpEL表达式，
+     如果表达式的计算结果为true，那么元素的主体内容就会渲染 -->
+<div sec:authorize="isAuthenticated()">
+    Hello <span sec:authentication="name">someone</span>
+</div>
+
+<!-- 类似JSP中一样，可以通过sec:authorize-url属性
+     基于给定URL的权限（结合安全配置）有条件地渲染内容 -->
+<!-- 如果用户有权限访问"/admin"的话，那么到管理页面的链接就会渲染，
+     否则的话，这个链接将不会渲染 -->
+<span sec:authorize-url="/admin">
+    <a th:href="@{/admin}">Admin</a>
+</span>
+```
+
+### 9.6 小结
+
+Spring Security提供了一种简单、灵活且强大的机制来保护用户的应用程序。
+
+借助于一系列Servlet Filter，Spring Security能够控制对Web资源的访问，包括Spring MVC控制器。借助于Spring Security的Java配置模型，不必直接处理Filter，能够非常简洁地声明Web安全性功能。
+
+当认证用户时，Spring Security提供了多种选项。基于内存用户库、关系型数据库和LDAP目录服务器来配置认证功能或者创建和配置自定义的用户服务。
 
 
 
