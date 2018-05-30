@@ -45,16 +45,16 @@ Spring将数据访问过程中固定的和可变的部分明确划分为两个�
 
 针对不同的持久化平台，Spring提供了多个可选的模板：
 
-| 模板类（org.springframework.*）                 | 用途                                               |
-| ----------------------------------------------- | -------------------------------------------------- |
-| jca.cci.core.CciTemplate                        | JCA CCI连接                                        |
-| jdbc.core.JdbcTemplate                          | JDBC连接                                           |
-| jdbc.core.namedparam.NamedParameterJdbcTemplate | 支持命名参数的JDBC连接                             |
-| jdbc.core.simple.SimpleJdbcTemplate             | 通过Java 5简化后的JDBC连接（Spring 3.1中已经废弃） |
-| orm.hibernate3.HibernateTemplate                | Hibernate 3.x以上的Session                         |
-| orm.ibatis.SqlMapClientTemplate                 | iBATIS SqlMap客户端                                |
-| orm.jdo.JdoTemplate                             | Java数据对象（Java Data Object）实现               |
-| orm.jpa.JpaTemplate                             | Java持久化API的实体管理器                          |
+| 模板类（org.springframework.*）                 | 用途                                                   |
+| ----------------------------------------------- | ------------------------------------------------------ |
+| jca.cci.core.CciTemplate                        | JCA CCI连接                                            |
+| jdbc.core.JdbcTemplate                          | JDBC连接                                               |
+| jdbc.core.namedparam.NamedParameterJdbcTemplate | 支持命名参数的JDBC连接                                 |
+| jdbc.core.simple.SimpleJdbcTemplate             | 通过Java 5简化后的JDBC连接（Spring 3.1中已经废弃）     |
+| orm.hibernate3.HibernateTemplate                | Hibernate 3.x以上的Session                             |
+| orm.ibatis.SqlMapClientTemplate                 | iBATIS SqlMap客户端                                    |
+| orm.jdo.JdoTemplate                             | Java数据对象（Java Data Object）实现                   |
+| orm.jpa.JpaTemplate                             | Java持久化API（Java Persistence API，JPA）的实体管理器 |
 
 ### 10.2 配置数据源
 
@@ -223,7 +223,281 @@ public DataSource dataSource() {
 
 #### 10.2.5 使用profile选择数据源
 
+通过Spring的profile特性，可以在运行时选择数据源，这取决于哪一个profile处于激活状态：
 
+```java
+package com.angus.spittr.config;
+import org.apache.commons.dbcp.BasicDataSource;
+import javax.sql.DataSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jndi.JndiObjectFactoryBean;
+@Configuration
+public class DataSourceConfiguration {
+    // 开发环境下的数据源
+    @Profile("development")
+    @Bean
+    public DataSource embeddedDataSource() {
+        return new EmbeddedDatabaseBuilder()
+            .setType(EmbeddedDatabaseType.H2)
+            .addScript("classpath:schema.sql")
+            .addScript("classpath:test-data.sql")
+            .build();
+    }
+    // QA环节的数据源
+    @Profile("qa")
+    @Bean
+    public DataSource Data() {
+        BasicDataSource ds = new BasicDataSource();
+        ds.setDriverClassName("org.h2.Driver");
+        ds.setUrl("jdbc:h2:tcp://localhost/~/spitter");
+        ds.setUsername("sa");
+        ds.setPassword("");
+        ds.setInitialSize(5);
+        ds.setMaxActive(10);
+        return ds;
+    }
+    // 生产环境数据源
+    @Profile("production")
+    @Bean
+    public DataSource dataSource() {
+        JndiObjectFactoryBean jndiObjectFactoryBean = new JndiObjectFactoryBean();
+        jndiObjectFactoryBean.setJndiName("jdbc/SpittrDS");
+        jndiObjectFactoryBean.setResourceRef(true);
+        jndiObjectFactoryBean.setProxyInterface(javax.sql.DataSource.class);
+        return (DataSource) jndiObjectFactoryBean.getObject();
+    }
+}
+```
+
+借助XML配置，基于profile选择数据源：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/jdbc
+                           http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
+                           http://www.springframework.org/schema/jee
+                           http://www.springframework.org/schema/jee/spring-jee-3.1.xsd
+                           http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- 开发环境下的数据源 -->
+    <beans profile="development">
+        <jdbc:embedded-database id="dataSource" type="H2"> 
+            <jdbc:script location="com/angus/spittr/db/jdbc/schema.sql"/> 
+            <jdbc:script location="com/angusa/spittr/db/jdbc/test-data.sql"/> 
+        </jdbc:embedded-database> 
+    </beans>
+    <!-- QA环节的数据源 -->
+    <beans profile="qa">
+        <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+              p:driverClassName="org.h2.Driver"
+              p:url="jdbc:h2:tcp://localhost/~/spitter"
+              p:username="sa"
+              p:password=""
+              p:initialSize="5"
+              p:maxActive="10" /> 
+    </beans>
+    <!-- 生产环境数据源 -->
+    <beans profile="production">
+        <jee:jndi-lookup id="dataSource"
+                         jndi-name="/jdbc/SpitterDS"
+                         resource-ref="true" /> 
+    </beans>
+</beans>
+```
+
+### 10.3 在Spring中使用JDBC
+
+#### 10.3.1 应对失控的JDBC代码
+
+如果使用JDBC所提供的直接操作数据库的API，需要负责处理与数据库访问相关的所有事情，其中包含管理数据库资源和处理异常。JDBC要求必须正确地管理连接和语句，并以某种方式处理可能抛出的SQLException异常。
+
+实际上，这些样板代码是非常重要的。清理资源和处理错误确保了数据访问的健壮性。如果没有它们的话，就不会发现错误而且资源也会处于打开的状态，这将会导致意外的代码和资源泄露。不仅需要这些代码，而且还要保证它是正确的。基于这样的原因，故而需要框架来保证这些代码只写一次而且是正确的。
+
+#### 10.3.2 使用JDBC模板
+
+Spring的JDBC框架承担了资源管理和异常处理的工作，从而简化了JDBC代码，只需编写从数据库读写数据的必需代码。Spring为JDBC提供了三个模板类供选择：
+
++ JdbcTemplate：最基本的Spring JDBC模板，这个模板支持简单的JDBC数据库访问功能以及基于索引参数的查询；
++ NamedParameterJdbcTemplate：使用该模板类执行查询时可以将值以命名参数的形式绑定到SQL中，而不是使用简单的索引参数； 
++ ~~SimpleJdbcTemplate~~：该模板类利用Java 5的一些特性如自动装箱、泛型以及可变参数列表来简化JDBC模板的使用。（已废弃，其特性已转移到JdbcTemplate）
+
+**使用JdbcTemplate来插入数据**
+
+为了让JdbcTemplate正常工作，只需要为其设置DataSource就可以了，这使得在Spring中配置JdbcTemplate非常容易，如下面的@Bean方法所示：
+
+```java
+@Bean
+public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+    return new JdbcTemplate(dataSource);
+}
+```
+
+现在，可以将jdbcTemplate装配到Repository中并使用它来访问数据库。例如，SpitterRepository使用了JdbcTemplate：
+
+```java
+// JdbcSpitterRepository类使用@Repository注解，其将会在组件扫描时自动创建
+// 当然，可以用注解@Bean替换
+@Repository
+public class JdbcSpitterRepository implements SpitterRepository {
+
+    private JdbcOperations jdbc;
+    // 也可以替换为@Inject注解，用于自动注入JdbcOperations对象；
+    // JdbcOperations是一个接口，定义了JdbcTemplate所实现的操作，
+    // 通过注入JdbcOperations，而不是具体的JdbcTemplate，
+    // 能够保证JdbcSpitterRepository通过JdbcOperations接口达到与JdbcTemplate保持松耦合。
+    @Autowired 
+    public JdbcSpitterRepository(JdbcOperations jdbc) {
+        this.jdbc = jdbc;
+    }
+    ...
+}
+```
+
+在Repository中具备可用的JdbcTemplate后，可以极大地简化程序的addSpitter()方法：
+
+```java
+// 样板代码已经放在模板类中，使得业务逻辑更清晰
+// 因为Spring的数据访问异常都是运行时异常，所以不必在addSpitter()方法中进行捕获
+public Spitter addSpitter(Spitter spitter) {
+    jdbc.update(
+        "insert into Spitter (username, password, first_name, last_name, email)" +
+        " values (?, ?, ?, ?, ?)",
+        spitter.getUsername(),
+        spitter.getPassword(),
+        spitter.getFirstName(),
+        spitter.getLastName(),
+        spitter.getEmail());
+}
+```
+
+**使用JdbcTemplate来读取数据**
+
+JdbcTemplate也简化了数据的读取操作。新版本的findOne()方法使用了JdbcTemplate的回调，实现根据ID查询Spitter，并将结果集映射为Spitter对象：
+
+```java
+private static final String SELECT_SPITTER = "select id, username, password, fullname, email, updateByEmail from Spitter";
+
+// 查询Spitter
+public Spitter findOne(long id) {
+    // 将查询结果映射到对象
+    // queryForObject()方法有三个参数：
+    //    String对象，包含了要从数据库中查找数据的SQL，
+    //    RowMapper对象，用来从ResultSet中提取数据并构建域对象（本例中为Spitter），
+    //    可变参数列表，列出了要绑定到查询上的索引参数值
+    return jdbcTemplate.queryForObject(
+        SELECT_SPITTER + " where id=?", new SpitterRowMapper(), id);
+}
+
+// 绑定参数
+// SpitterRowMapper实现了RowMapper接口，对于查询返回的每一行数据，
+// JdbcTemplate将会调用RowMapper的mapRow()方法，并传入一个ResultSet和包含行号的整数
+private static final class SpitterRowMapper implements RowMapper<Spitter> {
+    public Spitter mapRow(ResultSet rs, int rowNum) throws SQLException {
+        long id = rs.getLong("id");
+        String username = rs.getString("username");
+        String password = rs.getString("password");
+        String fullName = rs.getString("fullname");
+        String email = rs.getString("email");
+        boolean updateByEmail = rs.getBoolean("updateByEmail");
+        return new Spitter(id, username, password, fullName, email, updateByEmail);
+    }		
+}
+```
+
+**在JdbcTemplate中使用Java 8的Lambda表达式**
+
+因为RowMapper接口只声明了addRow()这一个方法，因此它完全符合函数式接口（functional interface）的标准：
+
+```java
+public Spitter findOne(long id) {
+    return jdbcOperations.queryForObject(
+        SELECT_SPITTER_BY_ID,
+        (rs, rowNum) -> {
+            return new Spitter(
+                rs.getLong("id"),
+                rs.getString("username"),
+                rs.getString("password"),
+                rs.getString("fullName"),
+                rs.getString("email"),
+                rs.getBoolean("updateByEmail"));
+        },
+        id);
+}
+```
+
+还可以使用Java 8的方法引用，在单独的方法中定义映射逻辑：
+
+```java
+public Spitter findOne(long id) {
+    return jdbcOperations.queryForObject(
+        SELECT_SPITTER_BY_ID, this::mapSpitter, id);
+}
+private Spitter mapSpitter(ResultSet rs, int row) throws SQLException {
+    return new Spitter(
+        rs.getLong("id"),
+        rs.getString("username"),
+        rs.getString("password"),
+        rs.getString("fullName"),
+        rs.getString("email"),
+        rs.getBoolean("updateByEmail"));
+}
+```
+
+**使用命名参数**
+
+命名参数可以赋予SQL中的每个参数一个明确的名字，在绑定值到查询语句的时候就通过该名字来引用参数。例如，假设SQL_INSERT_SPITTER查询语句是这样定义的：
+
+```java
+private static final String SQL_INSERT_SPITTER =
+    "insert into spitter (username, password, fullname) " +
+    "values (:username, :password, :fullname)";
+```
+
+使用命名参数查询，可以按照名字来绑定值，绑定值的顺序就不重要了。如果查询语句发生了变化导致参数的顺序与之前不一致，不需要修改绑定的代码。
+
+NamedParameterJdbcTemplate是一个特殊的JDBC模板类，它支持使用命名参数。在Spring中，NamedParameterJdbcTemplate的声明方式与常规的JdbcTemplate几乎完全相同：
+
+```java
+@Bean
+public NamedParameterJdbcTemplate jdbcTemplate(DataSource dataSource) {
+    return new NamedParameterJdbcTemplate(dataSource);
+}
+```
+
+使用Spring JDBC模板的命名参数功能：
+
+```java
+private static final String INSERT_SPITTER =
+    "insert into Spitter " +
+    " (username, password, fullname, email, updateByEmail) " +
+    "values " +
+    " (:username, :password, :fullname, :email, :updateByEmail)";
+public void addSpitter(Spitter spitter) {
+    // 命名参数通过Map类进行绑定
+    Map<String, Object> paramMap = new HashMap<String, Object>();
+    paramMap.put("username", spitter.getUsername());
+    paramMap.put("password", spitter.getPass  word());
+    paramMap.put("fullname", spitter.getFullName());
+    paramMap.put("email", spitter.getEmail());
+    paramMap.put("updateByEmail", spitter.isUpdateByEmail());
+    jdbcOperations.update(INSERT_SPITTER, paramMap);
+}
+```
+
+### 10.4 小结
+
+在Java中，JDBC是与关系型数据库交互的最基本方式。但是按照规范，JDBC有些太笨重了。Spring能够解除使用JDBC中的大多数痛苦，包括消除样板式代码、简化JDBC异常处理，用户所需要做的仅仅是关注要执行的SQL语句。
+
+在本章中，介绍了Spring对数据持久化的支持，以及Spring为JDBC所提供的基于模板的抽象，它能够极大地简化JDBC的使用。
 
 
 

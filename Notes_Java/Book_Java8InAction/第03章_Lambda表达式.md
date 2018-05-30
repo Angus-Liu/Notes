@@ -154,7 +154,7 @@ portNumber = 31337;                                   或事实上最终的
 
 #### 3.6.1 管中窥豹
 
-你为什么应该关心方法引用？方法引用可以被看作仅仅调用特定方法的Lambda的一种快捷 写法。它的基本思想是，如果一个Lambda代表的只是“直接调用这个方法”，那最好还是用名称 来调用它，而不是去描述如何调用它。事实上，方法引用就是让你根据已有的方法实现来创建 Lambda表达式。
+你为什么应该关心方法引用？方法引用可以被看作仅仅调用特定方法的Lambda的一种快捷写法。它的基本思想是，如果一个Lambda代表的只是“直接调用这个方法”，那最好还是用名称 来调用它，而不是去描述如何调用它。事实上，方法引用就是让你根据已有的方法实现来创建 Lambda表达式。
 
 当你需要使用方法引用时 ，目 标引用 放 在 分隔符::前 ，方法 的 名 称放在 后 面 。例如 ， Apple::getWeight就是引用了Apple类中定义的方法getWeight。请记住，不需要括号，因为你没有实际调用这个方法。方法引用就是Lambda表达式(Apple a) -> a.getWeight()的快捷写法。
 
@@ -175,7 +175,7 @@ portNumber = 31337;                                   或事实上最终的
 
 (2) 指向任意类型实例方法的方法引用 （ 例如 String 的 length 方 法 ， 写作 String::length）。 
 
-(3) 指向现有对象的实例方法的方法引用（假设你有一个局部变量expensiveTransaction用于存放Transaction类型的对象，它支持实例方法getValue，那么你就可以写expensiveTransaction::getValue）。
+(3) 指向现有对象的实例方法的方法引用（假设你有一个局部变量expensiveTransaction用于存放Transaction类型的对象，它支持实例方法getValue，那么你就可以写expensiveTransaction::getValue）。
 
 ![1526981000987](assets/1526981000987.png)
 
