@@ -1,17 +1,17 @@
 将下面的的代码（可以按自己需求更改）保存到一个批处理文件，例如gl.bat中，再将该文件所在的路径添加到path环境变量下。之后就可以通过cmd或运行窗口输入"gl"直接调用改脚本，很方面地提交代码。
 
 ```bash
+echo 执行cd命令：进入本地指定仓库
+
 cd /d E:\Data_Learning\Notes
-
-echo 执行git命令：更新笔记仓库
-
-git add N* 
 
 echo 执行git命令：添加以N开头的文件或文件夹
 
-git add README.md
+git add N* 
 
 echo 执行git命令：添加README
+
+git add README.md
 
 echo 执行git命令：添加描述
 
