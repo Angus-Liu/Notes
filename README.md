@@ -4,13 +4,20 @@
 >
 > A strong man can save himself, a great man can save another. 
 
-+ [**Notes_AlgorithmTraining**](Notes_AlgorithmTraining)
++ [**Notes_Algorithm**](Notes_Algorithm)
+  + [Book_Algorithms](Notes_Algorithm/Book_Algorithms)
   + [Training_LeetCode](Notes_AlgorithmTraining/Training_LeetCode)
   + [Training_剑指offer](Notes_AlgorithmTraining/Training_剑指offer)
++ [Notes_Assembly](Notes_Assembly)
+  + [Book_汇编语言](Notes_Assembly/Book_汇编语言)
++ [Notes_DesignPattern](Notes_DesignPattern)
+  + [Book_设计模式的艺术](Notes_DesignPattern/Book_设计模式的艺术)
 + [**Notes_English**](Notes_English) 
   + [Book_莱氏经典英语语法](Notes_English/Book_莱氏经典英语语法)
 + [**Notes_Java**](Notes_Java) 
+  + [Book_Java8InAction](Notes_Java/Book_Java8InAction)
   + [Book_JavaNetworkProgramming](Notes_Java/Book_JavaNetworkProgramming)
+  + [Book_深入理解Java虚拟机](Notes_Java/Book_深入理解Java虚拟机)
 + **[Notes_JavaWeb](Notes_JavaWeb)** 
   + [Book_HeadFirstServlets&JSP](Notes_JavaWeb/Book_HeadFirstServlets&JSP)
   + [Book_Maven实战](Notes_JavaWeb/Book_Maven实战)
@@ -19,6 +26,9 @@
 + [**Notes_Linux**](Notes_Linux) 
   + [Book_LinuxCommandLineAndShellScriptingBible](Notes_Linux/Book_LinuxCommandLine )
   + [Book_鸟哥的Linux私房菜（基础学习篇）](Notes_Linux/Book_鸟哥的Linux私房菜（基础学习篇）) 
++ [Notes_Network](Notes_Network)
+  + [Book_图解HTTP](Notes_Network/Book_图解HTTP)
+  + [Book_图解TCP&IP](Notes_Network/Book_图解TCP&IP)
 + [**Notes_Plan**](Notes_Plan) 
   + [Plan_Learning](Notes_Plan/Plan_Learning )
   + [Plan_Read ](Notes_Plan/Plan_Read )
