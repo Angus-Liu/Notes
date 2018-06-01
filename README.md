@@ -17,7 +17,7 @@
   + [Book_NettyInAction](Notes_JavaWeb/Book_NettyInAction)
   + [Book_SpringInAction](Notes_JavaWeb/Book_SpringInAction)
 + [**Notes_Linux**](Notes_Linux) 
-  + [Book_LinuxCommandLineAndShellScriptingBible](Notes_Linux/Book_LinuxCommandLineAndShellScriptingBible )
+  + [Book_LinuxCommandLineAndShellScriptingBible](Notes_Linux/Book_LinuxCommandLine )
   + [Book_鸟哥的Linux私房菜（基础学习篇）](Notes_Linux/Book_鸟哥的Linux私房菜（基础学习篇）) 
 + [**Notes_Plan**](Notes_Plan) 
   + [Plan_Learning](Notes_Plan/Plan_Learning )
