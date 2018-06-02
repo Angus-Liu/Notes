@@ -1,4 +1,4 @@
-## Maven实战
+## Head First Servlets and JSP 2nd Edition
 
 > 回顾**Java EE基础知识**，参考自书籍[《Head First Servlets and JSP 2nd Edition》](https://book.douban.com/subject/4604858/)，部分内容根据Java EE新规范进行了更新。
 >
