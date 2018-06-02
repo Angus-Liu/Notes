@@ -21,7 +21,7 @@
   + [Book_Java_Network_Programming](Notes_Java/Book_Java_Network_Programming)
   + [Book_深入理解Java虚拟机](Notes_Java/Book_深入理解Java虚拟机)
 + **[Notes_JavaWeb](Notes_JavaWeb)** 
-  + [Book_Head_First_Servlets_and_JSP](Notes_JavaWeb/Book_Head_First_Servlets_and_JSP)
+  + [Book_Head_First_Servlets\_&\_JSP](Notes_JavaWeb/Book_Head_First_Servlets_&_JSP)
   + [Book_Maven实战](Notes_JavaWeb/Book_Maven实战)
   + [Book_Netty_In_Action](Notes_JavaWeb/Book_Netty_In_Action)
   + [Book_Spring_In_Action](Notes_JavaWeb/Book_Spring_In_Action)
