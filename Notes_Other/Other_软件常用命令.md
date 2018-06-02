@@ -1,6 +1,7 @@
 ### MySQL常用命令
 
-+ 开启MySQL服务：命令行net start mysql57
++ 命令行开启MySQL服务：net start mysql57
++ 命令行关闭MySQL服务：net stop mysql57
 
 ### Tomcat常用命令 
 
