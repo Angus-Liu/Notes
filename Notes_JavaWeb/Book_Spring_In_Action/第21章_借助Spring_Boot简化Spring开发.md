@@ -46,7 +46,47 @@ Spring Boot Starter依赖将所需的常见依赖按组聚集在一起，形成�
 | spring-boot-starter-websocket         | spring-boot-starter-web、 spring-websocket、 <br>tomcat-embed-core、 tomcat-embed-logging-juli |
 | spring-boot-starter-ws                | spring-boot-starter、 spring-boot-starter-web、 <br>spring-core、 spring-jms、 spring-oxm、 spring-ws-core、<br>spring-ws-support |
 
-#### 21.1.2 单条配置
+#### 21.1.2 自动配置
+
+Spring Boot的Starter减少了构建中依赖列表的长度，而Spring Boot的自动配置功能则削减了Spring配置的数量。它在实现时，会考虑应用中的其他因素并推断所需要的Spring配置。
+
+作为样例，第6章中要将Thymeleaf模板作为Spring MVC的视图，至少需要三个bean：ThymeleafViewResolver、SpringTemplateEngine和TemplateResolver。但是，使用Spring Boot自动配置的话，需要做的仅仅是将Thymeleaf添加到项目的类路径中。如果Spring Boot探测到Thymeleaf位于类路径中，它就会推断需要使用Thymeleaf实现Spring MVC的视图功能，并自动配置这些bean。
+
+Spring Boot Starter也会触发自动配置。例如，在Spring Boot应用中，如果想要使用Spring MVC的话，所需要做的仅仅是将Web Starter作为依赖放到构建之中。将Web Starter作为依赖放到构建中以后，它会自动添加Spring MVC依赖。如果Spring Boot的Web自动配置探测到Spring MVC位于类路径下，它将会自动配置支持Spring MVC的多个bean，包括视图解析器、资源处理器以及消息转换器（等等）。接下来需要做的就是编写处理请求的控制器。
+
+#### 21.1.3 Spring Boot CLI
+
+Spring Boot CLI充分利用了Spring Boot Starter和自动配置的魔力，并添加了一些Groovy的功能。它简化了Spring的开发流程，通过CLI，能够运行一个或多个Groovy脚本，并查看它是如何运行的。在应用的运行过程中，CLI能够自动导入Spring类型并解析依赖。
+
+用来阐述Spring Boot CLI的最有趣的例子就是如下的Groovy脚本：
+
+```groovy
+@RestController
+class Hi {
+    @RequestMapping("/")
+    String hi() {
+        "Hi!"
+    }
+}
+```
+
+如果已经安装过Spring Boot CLI，可以使用如下的命令行来运行它：
+
+```bash
+$ spring run Hi.groovy
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
