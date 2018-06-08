@@ -76,7 +76,16 @@ class Hi {
 $ spring run Hi.groovy
 ```
 
+#### 21.1.4 Actuator
 
+Spring Boot Actuator为Spring Boot项目带来了很多有用的特性，包括：
+
++ 管理端点；
++ 合理的异常处理以及默认的“/error”映射端点；
++ 获取应用信息的“/info”端点；
++ 当启用Spring Security时，会有一个审计事件框架。
+
+### 21.2 使用Spring Boot构建应用 
 
 
 
