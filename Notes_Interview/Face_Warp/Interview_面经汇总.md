@@ -26,6 +26,14 @@ innodb和myisam锁的区别
 
 git和maven他简单提了下说怎么用
 
+1. String StringBuffer StringBuilder关系区别，字符串拼接底层原理以及过程中生成了几个对象？
+2. 关于Spring事务隔离的，忘了问的啥
+3. Windows系统如何实现异步？
+4. 递归用到的哪个数据结构？栈。 怎么防止栈溢出？尾递归
+5. nio阻塞和非阻塞，异步和非阻塞区别？
+6. MySQL 引擎innodb和myisam锁的区别？innodb行级，myisam表级
+7. 索引如何使用？如何判断索引失效？
+
 【关日鹏】
 
 行级锁和表级锁的区别
