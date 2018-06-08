@@ -20,6 +20,12 @@ innodb和myisam锁的区别
 
 [Spring 事务管理机制概述（有隔离级别） ](https://blog.csdn.net/justloveyou_/article/details/73733278 )
 
+1.springMVC能问的几乎都问了 
+
+2.spring ioc和aop 3.socket怎么用，口述一个简单的socket程序，包括客户端和服务端 4.如何将一个包含数据的实例对象通过socket进行上传并在服务端进行解析 5.如何在Linux上部署项目，详细步骤 6.nginx如何与tomcat进行负载均衡？ 7.redis如何做缓存？ 8.分布式服务器集群用到哪些技术？了解的技术原理谈谈,这些技术是怎么用的？ 
+
+git和maven他简单提了下说怎么用
+
 【关日鹏】
 
 行级锁和表级锁的区别

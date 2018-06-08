@@ -87,15 +87,178 @@ Spring Boot Actuator为Spring Boot项目带来了很多有用的特性，包括�
 
 ### 21.2 使用Spring Boot构建应用 
 
+#### 21.2.1 处理请求
 
+#### 21.2.2 创建视图
 
+#### 21.2.3 添加静态内容
 
+#### 21.2.4 持久化数据
 
+#### 21.2.5 尝试运行
 
+### 21.3 组合使用Groovy与Spring Boot CLI
 
+#### 21.3.1 编写Groovy控制器
 
+#### 21.3.2 使用Groovy Repository实现数据持久化
 
+#### 21.3.3 运行Spring Boot CLI
 
+### 21.4 通过Actuator获取了解应用内部状况
 
+Spring Boot Actuator所完成的主要功能就是为基于Spring Boot的应用添加多个有用的管理端点。这些端点包括以下几个内容。
 
++ GET /autoconfig：描述了Spring Boot在使用自动配置的时候，所做出的决策；
++ GET /beans：列出运行应用所配置的bean；
++ GET /configprops：列出应用中能够用来配置bean的所有属性及其当前的值；
++ GET /dump：列出应用的线程，包括每个线程的栈跟踪信息；
++ GET /env：列出应用上下文中所有可用的环境和系统属性变量；
++ GET /env/{name}：展现某个特定环境变量和属性变量的值；
++ GET /health：展现当前应用的健康状况；
++ GET /info：展现应用特定的信息；
++ GET /metrics：列出应用相关的指标，包括请求特定端点的运行次数；
++ GET /metrics/{name}：展现应用特定指标项的指标状况；
++ POST /shutdown：强制关闭应用；
++ GET /trace：列出应用最近请求相关的元数据，包括请求和响应头。
 
+为了启用Actuator，只需将Actuator Starter依赖添加到项目中即可。如果使用Gradle构建Java应用的话，那么在build.gradle的dependencies代码块中需要添加如下的依赖：
+
+```groovy
+compile("org.springframework.boot:spring-boot-starter-actuator")
+```
+
+或者，在项目的Maven pom.xml文件中，可以添加如下的\<dependency>：
+
+```xml
+<dependency>
+    <groupId> org.springframework.boot</groupId>
+    <artifactId>spring-boot-actuator</artifactId>
+</dependency>
+```
+
+添加完Spring Boot Actuator之后，可以重新构建并启动应用，然后打开浏览器访问以上所述的端点来获取更多信息。例如，如果想要查看Spring应用上下文中所有的bean，那么可以访问http://localhost:8080/beans。如果使用curl命令行工具的话，所得到的结果将会如下所示：
+
+```json
+$ curl http://localhost:8080/beans
+[
+    {
+        "beans": [
+            {
+                // 可以看到有一个ID为contactController的bean，
+                // 它依赖于名为contactRepository的bean，
+                // 而contactRepository又依赖于jdbcTemplatebean
+                "bean": "contactController",
+                "dependencies": [
+                    "contactRepository"
+                ],
+                "resource": "null",
+                "scope": "singleton",
+                "type": "ContactController"
+            },
+            {
+                "bean": "contactRepository",
+                "dependencies": [
+                    "jdbcTemplate"
+                ],
+                "resource": "null",
+                "scope": "singleton",
+                "type": "ContactRepository"
+            },
+            ...
+            {
+                "bean": "jdbcTemplate",
+                "dependencies": [],
+                "resource": "class path resource [...]",
+                "scope": "singleton",
+                "type": "org.springframework.jdbc.core.JdbcTemplate"
+            },
+            ...
+        ]
+            }
+        ]
+```
+
+另外一个端点也能帮助了解Spring Boot自动配置的内部情况，这就是“/autoconfig”。这个端点所返回的JSON描述了Spring Boot在自动配置bean的时候所做出的决策。例如，当针对Contacts应用调用“/autoconfig”端点时，如下展现了删减后的JSON结果：
+
+```json
+$ curl http://localhost:8080/autoconfig
+{
+    // 报告包含了两部分：一部分是没有匹配上的（negative matches）
+    "negativeMatches": {
+        "AopAutoConfiguration": [
+            {
+                "condition": "OnClassCondition",
+                "message": "required @ConditionalOnClass classes not found:
+                org.aspectj.lang.annotation.Aspect,
+                org.aspectj.lang.reflect.Advice"
+            }
+        ],
+        "BatchAutoConfiguration": [
+            {
+                "condition": "OnClassCondition",
+                "message": "required @ConditionalOnClass classes not found:
+                org.springframework.batch.core.launch.JobLauncher"
+            }
+        ],
+        ...
+    },
+        // 一部分是匹配上的（positive matches）
+        "positiveMatches": {
+            // 因为在类路径下找到了SpringTemplateEngine，Thymeleaf自动配置将会发挥作用
+            // 除非明确声明了默认的模板解析器、视图解析器以及模板bean否则的话，这些bean会进行自动配置
+            // 只有在类路径中能够找到Servlet类，才会自动配置默认的视图解析器
+            "ThymeleafAutoConfiguration": [
+                {
+                    "condition": "OnClassCondition",
+                    "message": "@ConditionalOnClass classes found:
+                    org.thymeleaf.spring4.SpringTemplateEngine"
+                }
+            ],
+            "ThymeleafAutoConfiguration.DefaultTemplateResolverConfiguration":[
+                {
+                    "condition": "OnBeanCondition",
+                    "message": "@ConditionalOnMissingBean
+                    (names: defaultTemplateResolver; SearchStrategy: all)
+                    found no beans"
+                }
+            ],
+            "ThymeleafAutoConfiguration.ThymeleafDefaultConfiguration": [
+                {
+                    "condition": "OnBeanCondition",
+                    "message": "@ConditionalOnMissingBean (types:
+                    org.thymeleaf.spring4.SpringTemplateEngine;
+                    SearchStrategy: all) found no beans"
+                }
+            ],
+            "ThymeleafAutoConfiguration.ThymeleafViewResolverConfiguration": [
+                {
+                    "condition": "OnClassCondition",
+                    "message": "@ConditionalOnClass classes found:
+                    javax.servlet.Servlet"
+                }
+            ],
+            "ThymeleafAutoConfiguration.ThymeleafViewResolverConfiguration
+            #thymeleafViewResolver": [
+            {
+            "condition": "OnBeanCondition",
+            "message": "@ConditionalOnMissingBean (names:
+            thymeleafViewResolver; SearchStrategy: all)
+            found no beans"
+        }
+        ],
+        ...
+    } }
+```
+
+### 21.5 小结
+
+Spring Boot用了两个技巧来消除Spring项目中的样板式配置：Spring Boot Starter和自动配置。
+
+一个简单的Spring Boot Starter依赖能够替换掉Maven或Gradle构建中多个通用的依赖。例如，在项目中添加Spring Boot Web依赖后，将会引入Spring Web和Spring MVC模块，以及Jackson 2数据绑定模块。
+
+自动配置充分利用了Spring 4.0的条件化配置特性，能够自动配置特定的Spring bean，用来启用某项特性。例如，Spring Boot能够在应用的类路径中探测到Thymeleaf，然后自动将Thymeleaf模板配置为Spring MVC视图的bean。
+
+Spring Boot的命令行接口（command-line interface，CLI）使用Groovy进一步简化了Spring项目。通过在Groovy代码中简单地引用Spring组件，CLI就能自动添加所需的Starter依赖（而这又会触发自动配置）。除此之外，通过Spring Boot CLI运行时，很多的Spring类型都不需要在Groovy代码中显式使用import语句导入。
+
+最后，Spring Boot Actuator为基于Spring Boot开发的Web应用提供了一些通用的管理特性，包括查看线程dump、Web请求历史以及Spring应用上下文中的bean。
