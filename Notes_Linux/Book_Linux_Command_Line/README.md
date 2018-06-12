@@ -10,4 +10,5 @@
 
 - [第01章_初始Linux_shell](第01章_初始Linux_shell.md )
 - [第02章_走进shell](第02章_走进shell.md)
+- [第03章_基本的bash_shell命令](第03章_基本的bash_shell命令.md)
 
