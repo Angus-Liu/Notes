@@ -6,8 +6,11 @@
 
 #### ▶ 待学课程（Courses that need to be learned）
 
-- [ ] **JavaWeb：**2小时学会Spring Boot
+- [x] **JavaWeb：**2小时学会Spring Boot
+- [ ] **SpringBoot：** Spring Boot进阶之Web进阶
+- [ ] **MyBatis：** 通过自动回复机器人学Mybatis——基础版
 - [ ] **SpringBoot：** SpringBoot+MyBatis搭建迷你小程序
+
 
 #### ▶ 待做作业（Homework that needs to be done）
 
