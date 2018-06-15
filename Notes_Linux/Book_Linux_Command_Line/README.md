@@ -13,4 +13,5 @@
 - [第03章_基本的bash_shell命令](第03章_基本的bash_shell命令.md)
 - [第04章_更多的bash_shell命令](第04章_更多的bash_shell命令.md)
 - [第05章_理解shell](第05章_理解shell.md)
+- [第06章_使用Linux环境变量](第06章_使用Linux环境变量.md)
 
