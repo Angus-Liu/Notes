@@ -11,6 +11,7 @@
 - [x] **MyBatis：** 通过自动回复机器人学Mybatis——基础版
 - [ ] **MyBatis：** 通过自动回复机器人学Mybatis——加强版
 - [ ] **SpringBoot + MyBatis：** SpringBoot + MyBatis搭建迷你小程序
+- [ ] **JavaScript：** JavaScript深入浅出
 
 
 #### ▶ 待做作业（Homework that needs to be done）
