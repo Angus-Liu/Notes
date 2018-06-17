@@ -52,3 +52,13 @@ $ echo $my_variable
 I am Global now
 ```
 
+### 6.6 定为系统环境变量
+
+在你登入Linux系统启动一个bash shell时，默认情况下bash会在几个文件中查找命令。这些文件叫作启动文件 或环境文件 。bash检查的启动文件取决于你启动bash shell的方式。启动bash shell有3种方式：
+
++ 登录时作为默认登录shell
++ 作为非登录shell的交互式shell
++ 作为运行脚本的非交互shell
+
+#### 6.6.1 登录shell
+
