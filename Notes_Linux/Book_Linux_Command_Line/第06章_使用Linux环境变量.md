@@ -60,5 +60,5 @@ I am Global now
 + 作为非登录shell的交互式shell
 + 作为运行脚本的非交互shell
 
-#### 6.6.1 登录shell
+#### 
 
