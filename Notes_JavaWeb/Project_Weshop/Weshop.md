@@ -1,0 +1,1 @@
+:shopping_cart: Weshop  is a campus online shopping platform which based on O2O model.
