@@ -22,6 +22,7 @@
 - [x] **企业级应用程序开发：** 实验报告（6月15号之前）
 - [ ] 总结 Better MaBatis & Better Spring
 - [ ] 翻译开发文档，记录博客或日志
+- [ ] 模仿取消空指针的做法，写一个方便的强转工具
 
 #### ▶ 待学知识（Knowledge that needs to be mastered）
 
