@@ -86,11 +86,14 @@
 30. IntelliJ IDEA生成foreach或者loop的快捷键 
 
     ```java
-    iter    Iterate (for each..in)   
-    itli    Iterate over a List  
-    itar    Iterate elements of array   
-    ritar   Iterate elements of array in reverse order   
+        iter    Iterate (for each..in)   
+        itli    Iterate over a List  
+        itar    Iterate elements of array   
+        ritar   Iterate elements of array in reverse order   
     ```
+
+31. 切换大小写 Ctrl + Shift + U
+
 
 # Eclipse 篇
 
