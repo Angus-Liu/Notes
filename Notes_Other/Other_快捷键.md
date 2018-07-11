@@ -94,6 +94,8 @@
 
 31. 切换大小写 Ctrl + Shift + U
 
+32. 调用处 Alt + F7、Ctrl + Alt + H
+
 
 # Eclipse 篇
 
