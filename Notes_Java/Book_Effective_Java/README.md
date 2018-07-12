@@ -4,7 +4,7 @@
 >
 > 下载链接：<http://readfree.me/book/27047716/>
 
-![âeffective java 3rd editionâçå¾çæç´¢ç"æ](assets/Effective Java 3rd Edition.jpg) 
+![effective java 3rd edition](assets/Effective Java 3rd Edition.jpg) 
 
 ## 目录
 
