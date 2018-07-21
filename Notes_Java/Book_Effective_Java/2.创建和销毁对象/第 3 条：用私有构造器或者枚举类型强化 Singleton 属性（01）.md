@@ -1,23 +1,75 @@
 ## 第 3 条：用私有构造器或者枚举类型强化 Singleton 属性
 
-A singleton is simply a class that is instantiated exactly once [Gamma95]. Singletons typically represent either a stateless object such as a function (Item 24) or a system component that is intrinsically unique. Making a class a singleton can make it difficult to test its clients because it’s impossible to substitute a mock implementation for a singleton unless it implements an interface that serves as its type.    
+单例（singleton）指仅仅被实例化一次的类 [[Gamma95](#Gamma95)]。单例对象通常表示无状态对象，如函数（function [第 24 条](item24)）或本质上唯一的系统组件。**使类成为单例会使测试它的客户端变得困难**，因为不可能用模拟实现代替单例，除非它实现一个充当其类型的接口。 
 
-甲*单*仅仅是被实例化恰好一次[类[Gamma95](https://www.safaribooksonline.com/library/view/effective-java-3rd/9780134686097/ref.xhtml#rGamma95) ]。单身人士通常代表无状态对象，例如函数（[第24项](https://www.safaribooksonline.com/library/view/effective-java-3rd/9780134686097/ch4.xhtml#lev24)）或本质上唯一的系统组件。**使类成为单例可能会使测试其客户端变得困难，**因为除非它实现了作为其类型的接口，否则不可能将模拟实现替换为单例。
+实现单例的方法有两种。这两者都基于保持构造器私有并导出公有静态成员以提供对唯一实例访问的方式。在第一种方法中，公有静态成员是个 final 域：
 
-实现单例的方法有两种。两者都基于保持构造函数私有并导出公共静态成员以提供对唯一实例的访问。在一种方法中，该成员是最终字段：
+```java
+// 公有域方法实现 singleton
+public class Elvis {
+    public static final Elvis INSTANCE = new Elvis();
+    private Elvis() { ... }
+    public void leaveTheBuilding() { ... }
+}
+```
 
-私有构造函数只调用一次，以初始化public static final字段`Elvis.INSTANCE`。缺少公共或受保护的构造函数可以*保证* “单一的”宇宙：`Elvis`一旦`Elvis`初始化类，就会存在一个实例- 不多也不少。客户端所做的任何事情都无法改变这一点，但有一点需要注意：特权客户端可以借助该方法反射性地调用私有构造函数（[第65项](https://www.safaribooksonline.com/library/view/effective-java-3rd/9780134686097/ch9.xhtml#lev65)）`AccessibleObject.setAccessible`。如果您需要防御此攻击，请修改构造函数以使其在要求创建第二个实例时抛出异常。
+私有构造器只会被调用一次，以初始化 `public static final` 字段 `Elvis.INSTANCE`。缺少公有或受保护的构造器可以保证全局唯一性：一旦 `Elvis` 类被初始化，`Elvis` 实例只会存在一个——不多也不少。客户端所做的任何事情都无法改变这一点，但要提醒一下：享有特权的客户端可以借助 `AccessibleObject.setAccessible` 方法，通过反射机制调用私有构造器（[第 65 项](item65)）。如果需要防范这种攻击，可以修改构造器，让它在被要求创建第二个实例时抛出异常。 
 
-在实现单例的第二种方法中，公共成员是一种静态工厂方法：
+在实现单例的第二种方法中，公有成员是个静态工厂方法：
 
-所有调用都`Elvis.getInstance`返回相同的对象引用，并且不会`Elvis`创建任何其他实例（前面提到过相同的警告）。
+```java
+// 静态工厂方法实现 singleton
+public class Elvis {
+    private static final Elvis INSTANCE = new Elvis();
+    private Elvis() { ... }
+    public static Elvis getInstance() { return INSTANCE; }
 
-公共字段方法的主要优点是API清楚地表明该类是单例：公共静态字段是final，因此它将始终包含相同的对象引用。第二个优点是它更简单。
+    public void leaveTheBuilding() { ... }
 
-静态工厂方法的一个优点是，它使您可以灵活地改变主意，关于类是否是单例而不更改其API。工厂方法返回唯一的实例，但可以修改它，例如，为每个调用它的线程返回一个单独的实例。第二个优点是，如果您的应用需要，您可以编写*通用的单件工厂*（[第30项](https://www.safaribooksonline.com/library/view/effective-java-3rd/9780134686097/ch5.xhtml#lev30)）。使用静态工厂的最后一个优点是*方法参考*可以用作供应商，例如`Elvis::instance`a `Supplier<Elvis>`。除非其中一个优点相关，否则公共领域方法更可取。
+}
+```
 
-为了使单一类使用这些方法中的任何一种可*序列化*（[第12章](https://www.safaribooksonline.com/library/view/effective-java-3rd/9780134686097/ch12.xhtml#ch12)），仅仅添加`implements Serializable`到其声明是不够的。要维护单例保证，请声明所有实例字段`transient`并提供`readResolve`方法（[第89项](https://www.safaribooksonline.com/library/view/effective-java-3rd/9780134686097/ch12.xhtml#lev89)）。否则，每次反序列化序列化实例时，都会创建一个新实例，在我们的示例中，将导致虚假`Elvis`目击。要防止这种情况发生，请将此`readResolve`方法添加到`Elvis`类中：
+对 `Elvis.getInstance` 的所有调用都会返回相同的对象引用，不会创建其他的 `Elvis` 实例（上述的提醒仍然适用）。
 
-实现单例的第三种方法是声明单元素枚举： 
+公有域方法的主要优点是 API 能清楚地表明该类是单例：公有静态域是 final 的，因此它始终包含相同的对象引用。第二个优点是它更简单。
 
-这种方法类似于公共领域方法，但它更简洁，免费提供序列化机制，并提供了对多个实例化的铁定保证，即使面对复杂的序列化或反射攻击。这种方法可能会有点不自然，但**单元素枚举类型通常是实现单例的最佳方法**。请注意，如果您的单例必须扩展超类`Enum`（除非您*可以*声明枚举来实现接口），否则不能使用此方法。 
+静态工厂方法的优势之一在于，它提供了灵活性，在不更改 API 的情况下，你可以改变类是否应该是单例的想法。 工厂方法返回唯一的实例，但可以对它进行修改，例如，改成为每个调用它的线程返回一个单独的实例。第二个优势是，如果应用需要，你可以编写通用的单例工厂（generic singleton factory [第 30 项](item30)）。使用静态工厂的最后一个优点是，方法引用（method reference）可以用作供应商（supplier），例如 `Elvis::instance` 即是一个 `Supplier<Elvis>`。除非与其中一个优点相关，否则公有域方法更可取。
+
+为了使借助这些方法实现的单例类是可序列化的（[第12章](chapter12)），仅仅在其声明添加 `implements Serializable` 是不够的。要维护并保证单例，需要声明所有实例字段为 `transient` 并提供 `readResolve` 方法（[第 89 项](item89)）。否则，每次对一个序列化实例进行反序列化时，都会创建一个新实例。比如，在我们的示例中，将导致出现假冒的 `Elvis`。为了防止这种情况发生，需要在 `Elvis` 类中加入下面这个 `readResolve` 方法：
+
+```java
+// readResolve 方法保护 singleton 性质
+private Object readResolve() {
+    // 返回真正的 Elvis， 
+    // 让垃圾回收器处理 Elvis 的模仿者
+    return INSTANCE;
+}
+```
+
+实现单例的第三种方法是声明一个单元素的枚举类（single-element enum）： 
+
+```java
+// Enum singleton - 首选的方法
+public enum Elvis {
+    INSTANCE;
+    public void leaveTheBuilding() { ... }
+}
+```
+
+这种方法类似于公有域方法，但它更简洁，并且无偿提供了序列化机制，即使面对复杂的序列化或反射攻击，依然能绝对防止多次实例化。这种方法可能会让人感觉有点不自然，但**单元素的枚举类型通常是实现单例的最佳方法**。请注意，如果你的单例必须继承除 `Enum` 之外的超类，就不能使用该方法（除非可以声明为枚举来实现接口）。 
+
+
+
+<p id="Gamma95">[Gamma95] Gamma,	Erich,	Richard	Helm,	Ralph	Johnson,	and	John	Vlissides.	1995. Design	Patterns:	Elements	of	Reusable	Object-Oriented	Software.	Reading, MA:	Addison-Wesley.	ISBN:	0201633612. </p>
+
+
+
+[item24]: url "在未来填入第 24 条的 url，否则无法跳转"
+[item30]: url "在未来填入第 30 条的 url，否则无法跳转"
+[item65]: url "在未来填入第 65 条的 url，否则无法跳转"
+[item89]: url "在未来填入第 89 条的 url，否则无法跳转"
+[chapter12]: url "在未来填入第 12 张的 url，否则无法跳转"
+
+
+
+> 翻译：Angus
