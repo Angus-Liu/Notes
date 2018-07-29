@@ -1,0 +1,159 @@
+# 避免使用<u>终止</u>【终结】方法（finalizer）和清除方法（cleaner）
+
+Finalizers are unpredictable, often dangerous, and generally unnecessary. Their use can cause erratic behavior, poor performance, and portability problems. Finalizers have a few valid uses, which we’ll cover later in this item, but as a rule, you should avoid them. As of Java 9, finalizers have been deprecated, but they are still being used by the Java libraries. The Java 9 replacement for finalizers is cleaners. Cleaners are less dangerous than finalizers, but still unpredictable, slow, and generally unnecessary.    
+
+**<u>终止方法不可预测，通常都是不安全的，而且通常情况下都不是必须使用的方法。</u>【终结方法（finalizer）是不可预测的，通常是危险的，并且一般情况下是不必要的。】** <u>终止</u>【终结】方法的使用会导致程序<u>执行的</u>【行为】不稳定，降低~~程序~~性能以及可移植性问题。<u>终止</u>【终结】方法【只在】很少【的】情况下有用，在本<u>节</u>【条目】的后面部分会做介绍，但根据经验~~来看~~，你应该避免使用<u>这种机制</u>【它们】。<u>在 JAVA 9 中</u>【从 Java 9 开始，】<u>终止</u>【终结】方法已经被弃用了，然而在一些 JAVA ~~函数~~库中依然可以看到它们的身影。<u>在 JAVA 9 中清除方法是终止方法的替代物</u>【Java 9 中替代终结方法的是清除方法（cleaner）】。**清除方法比<u>终止</u>【终结】方法<u>安全性更高一些</u>【危险性低一些】，但<u>依然</u>【仍然】是不可预测的，~~会使程序~~运行缓慢，通常情况下依然是不必要的**。
+
+[批注]:(//)	"终止：停止，不再继续。终结：完结、收场,形容最后结束的意思。依文意，“终结”更适合，所以全文后面出现“终止”的地方，直接替换为了“终结”，望理解 :)；对啦，将“依然”修改为“仍然”只是为了减少用词重复性"
+
+C++ programmers are cautioned not to think of finalizers or cleaners as Java’s analogue of C++ destructors. In C++, destructors are the normal way to reclaim the resources associated with an object, a necessary counterpart to constructors. In Java, the garbage collector reclaims the storage associated with an object when it becomes unreachable, requiring no special effort on the part of the programmer. C++ destructors are also used to reclaim other nonmemory resources. In Java, a try-with-resources or try-finally block is used for this purpose (Item 9).    
+
+【C++ 程序员被告知】不要把 <u>JAVA</u>【Java】 的终结方法或清除方法与 C++ 中的析构函数【（destructor）】当成类似的机制。在 C++ 中，析构函数是回收【一个】对象【所占用】资源的标准方法，<u>而且也是与构造函数配对的必要的函数</u>【是构造函数所必需的对应物】。在 Java 中，<u>垃圾回收机制回收不可用对象所占空间时是不需要程序员做额外工作的</u>【当一个对象变得不可达时，垃圾回收器会回收与该对象相关联的存储空间，不需要程序员做专门的工作】。C++ 的析构函数也可以【被用来】回收其他非内存资源，而在 <u>JAVA</u>【Java】 中，一般用 `try-with-resources` 或者 `try-finally` 块达到同样的目的（[第 9 条][item9]）。
+
+[批注]: (//)	"Java 的垃圾回收机制是在对象不可达时（即从 GC Root 无法达到该对象）对其进行回收"
+
+One shortcoming of finalizers and cleaners is that there is no guarantee they’ll be executed promptly [JLS, 12.6]. It can take arbitrarily long between the time that an object becomes unreachable and the time its finalizer or cleaner runs. This means that you should never do anything time-critical in a finalizer or cleaner. For example, it is a grave error to depend on a finalizer or cleaner to close files because open file descriptors are a limited resource. If many files are left open as a result of the system’s tardiness in running finalizers or cleaners, a program may fail because it can no longer open files.    
+
+终结方法和清除方法不能保证其被<u>迅速</u>【及时】执行是<u>它的一大缺点</u>【它们的缺点之一】【 [JLS, 12.6]】。<u>当对象变得不可达时，终止方法或清除方法的执行时间是不固定的。</u>【从一个对象变得不可达开始到它的终结方法或清除方法被执行，所花费的时间是任意长的。】这意味着**不应该在终结方法或清除方法中执行任何<u>对时序要求严格</u>【注重时间（time-critical）】的任务**。比如，依靠终结方法或清除方法~~完成~~关闭已<u>达</u>【打】开文件【的】操作<u>会导致</u>【就是】严重错误，因为打开文件的描述符是一种很有限的资源。由于 JVM 会延迟执行终结方法或清除方法，所以大量文件会保留在打开状态，当一个程序不能再打开文件时，它可能会运行失败。
+
+[批注]: (//)	"将“迅速”改为“及时“，是结合了《深入理解 JVM》一书，因 finalizer 和 cleaner 的执行是在 GC 时期，而 GC 具有不确定性，故这里强调的应该是它们不会被”及时“执行"
+
+The promptness with which finalizers and cleaners are executed is primarily a function of the garbage collection algorithm, which varies widely across implementations. The behavior of a program that depends on the promptness of finalizer or cleaner execution may likewise vary. It is entirely possible that such a program will run perfectly on the JVM on which you test it and then fail miserably on the one favored by your most important customer.    
+
+及时地执行终结方法和清除方法正是垃圾回收算法的【一个】主要功能，<u>然而这种算法在 JVM 实现中过程中却大变化很大，</u>【它在不同的 JVM 实现中差别很大。】<u>取决于</u>【依赖于】终结方法或清除方法执行<u>效率</u>【及时性】的程序<u>性能</u>【的表现】也可能<u>不同</u>【发现同样的变化】。这样的程序在你测试用的 JVM 平台上运行得非常好，<u>然后</u>【而】在你最重要的客户的 JVM 平台上却根本无法运行，这种情况是完全有可能发生的。
+
+Tardy finalization is not just a theoretical problem. Providing a finalizer for a class can arbitrarily delay reclamation of its instances. A colleague debugged a long-running GUI application that was mysteriously dying with an OutOfMemoryError. Analysis revealed that at the time of its death, the application had thousands of graphics objects on its finalizer queue just waiting to be finalized and reclaimed. Unfortunately, the finalizer thread was running at a lower priority than another application thread, so objects weren’t getting finalized at the rate they became eligible for finalization. The language specification makes no guarantees as to which thread will execute finalizers, so there is no portable way to prevent this sort of problem other than to refrain from using finalizers. Cleaners are a bit better than finalizers in this regard because class authors have control over their own cleaner threads, but cleaners still run in the background, under the control of the garbage collector, so there can be no guarantee of prompt cleaning.    
+
+<u>缓慢终止</u>【延迟终结过程】不仅仅只是一个理论上的问题。给一个类添加终结方法<u>可以</u>【会】任意地延迟<u>回收该类实例的过程</u>【其实例的回收过程】。我的一位同事在调试一个长期运行的 GUI 应用时，程序莫名其妙报了~~内存溢出（~~ `OutOfMemoryError` ~~）~~的错误，然后<u>谜之崩溃</u>【死掉】。<u>我们分析程序崩溃的原因时发现</u>【分析表明其死掉的时期】，~~这个~~应用程序的终结方法队列中有成千上万个图【形】对象（graphics objects）在等着被终结和回收。不幸的是【，】这个终结方法线程【的优先级】比该程序的其它线程的优先级低，所以这些对象<u>终止</u>【被终结】的速度<u>不能达到它本应该达到</u>【比不上它们进入终结状态】的速度。<u>JAVA</u>【Java】 语言【规范】并不能保证哪个线程会执行终结方法，所以除了避免使用终结方法之外，没有别的【简便】方法来<u>防止</u>【避免】这类问题。在这方面清除方法比终结方法好一点，因为类的作者可以控制<u>该类的</u>【自己的】清除方法线程，但是清除方法依然会在垃圾回收器的控制下在后台运行，所以也不能保证及时<u>清除方法的及时运行</u>【清除】。
+
+Not only does the specification provide no guarantee that finalizers or cleaners will run promptly; it provides no guarantee that they’ll run at all. It is entirely possible, even likely, that a program terminates without running them on some objects that are no longer reachable. As a consequence, you should never depend on a finalizer or cleaner to update persistent state. For example, depending on a finalizer or cleaner to release a persistent lock on a shared resource such as a database is a good way to bring your entire distributed system to a grinding halt.    
+
+<u>JAVA</u>【Java】 语言【规范】不仅不能保证终结方法或清除方法<u>的及时执行</u>【及时地执行】，它甚至都不能保证它们会被执行。当【一个】程序终止时，某些已经无法访问的对象的终结方法却根本没有执行，这也是完全有可能的情况。所以，**永远不要<u>使用</u>【依赖】终结方法或清除方法来更新重要的持久状态**。比如，<u>使用</u>【依赖】终结方法或清除方法释放共享资源（比如数据库）上的<u>永久</u>【持久】锁【（persistent lock）】，很容易让整个分布式系统垮掉。
+
+Don’t be seduced by the methods System.gc and System.runFinalization. They may increase the odds of finalizers or cleaners getting executed, but they don’t guarantee it. Two methods once claimed to make this guarantee: System.runFinalizersOnExit and its evil twin, Runtime.runFinalizersOnExit. These methods are fatally flawed and have been deprecated for decades [ThreadStop].    
+
+不要被 `System.gc`  和 `System.runFinalization` 这两个方法<u>诱导</u>【诱惑】。它们可能会提高终结方法或清除方法被执行的几率，但也不保证它们一定会被执行。有两种方法曾经作出这样的保证：`System.runFinalizersOnExit` 和它【臭名昭著】的兄弟 `Runtime.runFinalizersOnExit` 【方法】。~~然而~~这些方法【都】有致命缺陷【，】并且已经被<u>贬低了十几年</u>【废弃了数十年】[ [ThreadStop](#ThreadStop)]。
+
+Another problem with finalizers is that an uncaught exception thrown during finalization is ignored, and finalization of that object terminates [JLS, 12.6]. Uncaught exceptions can leave other objects in a corrupt state. If another thread attempts to use such a corrupted object, arbitrary nondeterministic behavior may result. Normally, an uncaught exception will terminate the thread and print a stack trace, but not if it occurs in a finalizer—it won’t even print a warning. Cleaners do not have this problem because a library using a cleaner has control over its thread.    
+
+终止方法存在另外一个问题，在终结过程中抛出的未被捕获的异常会被忽略，并且~~会停止~~对象的终止过程【也会终止】 [JSL, 12.6]。<u>这些被忽略</u>【未捕获】的异常会使其他对象处于~~被~~破坏（a corrupt state）的状态。如果其他线程【试图】使用~~了~~这些被破坏的对象，将会导致任意<u>不可预测的结果</u>【不确定的行为】。<u>一般地</u>【通常】，未被捕获的异常会~~终止~~终止线程并打印出栈轨迹（stack trace），但<u>在</u>【发生在】终结方法中却不会这么做——它【甚至】不会打印出任何一条警告信息。清除方法没有这个问题，因为使用清除方法的库可以控制它的线程。
+
+There is a severe performance penalty for using finalizers and cleaners. On my machine, the time to create a simple AutoCloseable object, to close it using try-with-resources, and to have the garbage collector reclaim it is about 12 ns. Using a finalizer instead increases the time to 550 ns. In other words, it is about 50 times slower to create and destroy objects with finalizers. This is primarily because finalizers inhibit efficient garbage collection. Cleaners are comparable in speed to finalizers if you use them to clean all instances of the class (about 500 ns per instance on my machine), but cleaners are much faster if you use them only as a safety net, as discussed below. Under these circumstances, creating, cleaning, and destroying an object takes about 66 ns on my machine, which means you pay a factor of five (not fifty) for the insurance of a safety net if you don’t use it.    
+
+**使用终结方法或清除方法会导致严重的性能损失**。在我的机器上【，】创建一个简单的 `AutoCloseable` 对象【，】使用 `try-with-resources` 来关闭它【，】并让垃圾回收器回收<u>其所占用的资源</u>【它】所用的时间<u>仅仅只有</u>【大约是】 12ns<u>，</u>【。】~~而~~使用终结方法【反而使时间增加】~~达~~到了 550 ns。换句话说，使用终结方法创建并销毁对象~~比不使用它时间~~慢了【大约】 50 倍。主要是因为终结方法抑制了高效的垃圾回收。如果你使用清除方法来清除类的【所有】实例，【其】速度和终结方法差不多（在我的机器上<u>野差不多是 500ns</u>【，清除每个实例所花费的时间大约是 500 ns】），但如果你【只是】把<u>清除方法</u>【它们】作为安全网（safety net）来使用，清除方法【的】速度将会快的多【，如下所述】。在这种情况下，创建、清除并销毁对象在我的机器上花了 66 ns，这意味着如果你不<u>适</u>【使】用安全网，<u>为了保险你要付出 5 倍（不是50）的代价</u>【你要为之支付 5 倍（不是 50 倍）的保险费】。
+
+Finalizers have a serious security problem: they open your class up to finalizer attacks. The idea behind a finalizer attack is simple: If an exception is thrown from a constructor or its serialization equivalents—the readObject and readResolve methods (Chapter 12)—the finalizer of a malicious subclass can run on the partially constructed object that should have “died on the vine.” This finalizer can record a reference to the object in a static field, preventing it from being garbage collected. Once the malformed object has been recorded, it is a simple matter to invoke arbitrary methods on this object that should never have been allowed to exist in the first place. Throwing an exception from a constructor should be sufficient to prevent an object from coming into existence; in the presence of finalizers, it is not. Such attacks can have dire consequences. Final classes are immune to finalizer attacks because no one can write a malicious subclass of a final class. To protect nonfinal classes from finalizer attacks, write a final finalize method that does nothing.    
+
+**终结方法还有一个严重的安全问题：它们<u>会使</u>【打开】你的类【致使其】受到终结方法攻击**（finalizer attacks）。<u>终止方法攻击</u>【终结方法攻击背后的思想】很简单：如果从构造器或它的序列化等价物——`readObject` 和 `readResolve` 方法<u>（[第 12 条][Item12]）</u>【（[第 12 章](chapter12)）】——抛出一个异常，恶意子类的终止方法就可以在部分构造的对象上运行，而这些对象本应该“死在藤蔓上”。这个终止方法可以在静态字段中记录对象的引用，从而防止对该对象进行垃圾回收。一旦记录了格式错误的对象（malformed object），在这个早就应该被销毁的对象上任意调用方法就会变得非常简单。**从构造器中抛出异常时，对象就不应该被创建，而终止方法面前却不是这样**。这样的攻击会导致可怕的结果。Final 类避免了终止方法攻击因为没人能给 final 类添加一个恶意子类。**为了让非 final 类避免终止方法攻击，请写一个不执行任何操作的 final 终止方法 **。
+
+[批注]: (//)	"该章还未进行校对"
+
+So what should you do instead of writing a finalizer or cleaner for a class whose objects encapsulate resources that require termination, such as files or threads? Just have your class implement AutoCloseable, and require its clients to invoke the close method on each instance when it is no longer needed, typically using try-with-resources to ensure termination even in the face of exceptions (Item 9). One detail worth mentioning is that the instance must keep track of whether it has been closed: the close method must record in a field that the object is no longer valid, and other methods must check this field and throw an IllegalStateException if they are called after the object has been closed.    
+
+那么对于对象封装资源需要被终止的类，比如文件或线程相关类，不使用其终止方法或清除方法，你应该怎么做呢？**让你的类实现 `AutoCloseable` 接口**，并且让客户端在每个实例不在被需要时调用 `close` 方法，通常使用 `Try-with-resources` 保证一旦出现异常确保其终止（[第 9 条][Item9]）。有个值得注意的细节，实例必须持续跟踪它是否被关闭：`close` 方法必须在一个字段中记录该对象是无效的，然后另一个方法必须检查这个字段，如果在该对象已经被关闭后请求则抛出 `IllegalStateException` 异常。
+
+So what, if anything, are cleaners and finalizers good for? They have perhaps two legitimate uses. One is to act as a safety net in case the owner of a resource neglects to call its close method. While there’s no guarantee that the cleaner or finalizer will run promptly (or at all), it is better to free the resource late than never if the client fails to do so. If you’re considering writing such a safety-net finalizer, think long and hard about whether the protection is worth the cost. Some Java library classes, such as FileInputStream, FileOutputStream, ThreadPoolExecutor, and java.sql.Connection, have finalizers that serve as safety nets.    
+
+那么，终止方法和清除方法有没有什么用处呢？它们可能有两种合法用途。一种用途是当对象的所有者忘记调用前面段落中建议使用的 `close` 方法的时，它们可以作为安全网（safety net）。虽然不能保证清除方法或终止方法会及时运行（或者根本不运行），那也比如果客户端不调用就永远不释放资源强得多。如果你正考虑写安全网终止方法，建议你三思这种额外的保护是否值得你付出这份额外的代价。比如 `FileInputStream`、`FileOutputStream`、`ThreadPoolExecutor` 和 `java.sql.Connection` 这些依赖库类，就使用的作为安全网的终止方法。
+
+A second legitimate use of cleaners concerns objects with native peers. A native peer is a native (non-Java) object to which a normal object delegates via native methods. Because a native peer is not a normal object, the garbage collector doesn’t know about it and can’t reclaim it when its Java peer is reclaimed. A cleaner or finalizer may be an appropriate vehicle for this task, assuming the performance is acceptable and the native peer holds no critical resources. If the performance is unacceptable or the native peer holds resources that must be reclaimed promptly, the class should have a close method, as described earlier.    
+
+另一种清除方法的合法用途与本地对等体（*native peer*s）有关。本地对等体是一个本地对象（非 Java 对象），普通对象通过本地方法委托给一个本地对象。因为本地对等体不是普通对象，所以垃圾回收器并不知道它的存在，所以当它的 Java 对等体被回收的时候它不会被回收。假设程序性能是可接受的而且本地对等体不含有关键资源，这样的情况下，清除方法或终止方法正好能派上用场。如果性能不可接受或者本地对等体含有必须被及时回收的资源，你应该使用前面段落中建议的 `close` 方法。
+
+Cleaners are a bit tricky to use. Below is a simple Room class demonstrating the facility. Let’s assume that rooms must be cleaned before they are reclaimed. The Room class implements AutoCloseable; the fact that its automatic cleaning safety net uses a cleaner is merely an implementation detail. Unlike finalizers, cleaners do not pollute a class’s public API:    
+
+清除方法使用起来有些棘手。下面用一个简单的 `Room` 类演示一下。假设 Room 的对象必须在它被回收前清除。`Room` 类实现了 `AutoCloseable` 接口，意味着它可以使用清除方法自动清除安全网。与终止方法不同，清除方法不会污染类的公共 API：
+
+```java
+//一个使用清除方法作为安全网的 AutoCloseable 类
+public class Room implements AutoCloseable {
+    private static final Cleaner cleaner = Cleaner.create();
+    
+    // 需要打扫的房间，一定不要认为与房间有关!
+    private static class State implements Runnable {
+        int numJunkPiles; // 房间里的垃圾堆数量
+        State(int numJunkPiles) {
+            this.numJunkPiles = numJunkPiles;
+        } 
+        
+        // 由 close 方法或清除方法调用
+        @Override 
+        public void run() {
+            System.out.println("Cleaning room");
+            numJunkPiles = 0;
+        }
+    } 
+    // 这个房间的状态, 与我们定义的 cleanable 共享
+    private final State state;
+    // 我们定义的 cleanable. 当可以获得垃圾回收器时清理房间
+    private final Cleaner.Cleanable cleanable;
+    public Room(int numJunkPiles) {
+        state = new State(numJunkPiles);
+        cleanable = cleaner.register(this, state);
+    } 
+    @Override 
+    public void close() {
+        cleanable.clean();
+    }
+}
+```
+
+T he static nested State class holds the resources that are required by the cleaner to clean the room. In this case, it is simply the numJunkPiles field, which represents the amount of mess in the room. More realistically, it might be a final long that contains a pointer to a native peer. State implements Runnable, and its run method is called at most once, by the Cleanable that we get when we register our State instance with our cleaner in the Room constructor. The call to the run method will be triggered by one of two things: Usually it is triggered by a call to Room’s close method calling Cleanable’s clean method. If the client fails to call the close method by the time a Room instance is eligible for garbage collection, the cleaner will (hopefully) call State’s run method.    
+
+静态内部类 `State` 含有清除方法所需要的资源来清理房间。使用 `numJunkPiles` 变量简单的表示房间中的垃圾。更实际地说，它可能包含了一个指向本地对等体的 `long` 常量指针。`State` 实现了`Runnable` 接口并且它的 `run` 方法只能被 `Cleanable` 调用一次，`cleanbale` 就是在 `Room` 构造器中把带有清除方法的 `State` 的实例添加时获得的对象。run 方法的调用会触发两件事：通常 Room 的 close 方法的调用会触发 Cleanable 的 clean 方法。如果在 Room 实例可以被回收时客户端调用 close 方法失败，清除方法将会有效的调用 State 类的 run 方法。
+
+It is critical that a State instance does not refer to its Room instance. If it did, it would create a circularity that would prevent the Room instance from becoming eligible for garbage collection (and from being automatically cleaned). Therefore, State must be a static nested class because nonstatic nested classes contain references to their enclosing instances (Item 24). It is similarly inadvisable to use a lambda because they can easily capture references to enclosing objects.    
+
+State 实例与 Room 实例无关，这一点至关重要。如果不是的话，将会使 Room 实例变得不可被回收（也不会被自动清理）。非静态内部类包含对它们封闭实例的引用（[第 24 条][Item24]），因此，State 必须是静态内部类。同样，使用 lambda 表达式也是不可取的，因为它们可以轻易捕获对封闭对象的引用。
+
+As we said earlier, Room’s cleaner is used only as a safety net. If clients surround all Room instantiations in try-with-resource blocks, automatic cleaning will never be required. This well-behaved client demonstrates that behavior:    
+
+前面段落中提到，Room 的清除方法仅仅是用来作为安全网的。如果客户端把所有的 Room 对象包含在 try-with-resource 块中实例化，就再也不需要自动清理了。下面这个行为良好的客户端演示了这种方式：
+
+```java
+public class Adult {
+    public static void main(String[] args) {
+        try (Room myRoom = new Room(7)) {
+            System.out.println("Goodbye");
+        }
+    }
+}
+```
+
+As you’d expect, running the Adult program prints Goodbye, followed by Cleaning room. But what about this ill-behaved program, which never cleans its room?    
+
+运行 Adult 程序，会向你期望的那样，在清理房间后输出 Goodbye。那么永远不会清扫房间的坏程序是怎样的呢？
+
+```java
+public class Teenager{
+    public static void main(String[] args){
+        new Room(99);
+        System.out.println("Peace out");
+    }
+}
+```
+
+You might expect it to print Peace out, followed by Cleaning room, but on my machine, it never prints Cleaning room; it just exits. This is the unpredictability we spoke of earlier. The Cleaner spec says, “The behavior of cleaners during System.exit is implementation specific. No guarantees are made relating to whether cleaning actions are invoked or not.” While the spec does not say it, the same holds true for normal program exit. On my machine, adding the line System.gc() to Teenager’s main method is enough to make it print Cleaning room prior to exit, but there’s no guarantee that you’ll see the same behavior on your machine.    
+
+你可能会期望它在清理完房间后打印出 Peace out，然而在我的机器上，它从没有打印过 Cleanning room ，它只会退出程序。这就是我们之前谈到的不可预测性。清除方法的规范这样说：“在 `System.exit` 的过程中清除方法的行为是具体的。关于是否调用清除操作并没有保证。”即使规范不这么说，对于正常程序退出也是如此。在我的机器上，给 Teenager 的 main 方法添加一行 `System.gc()` 就可以让它在退出程序前打印出 `Cleaning room`  ，但不保证你能在你的电脑上看到同样的情形。
+
+In summary, don’t use cleaners, or in releases prior to Java 9, finalizers, except as a safety net or to terminate noncritical native resources. Even then, beware the indeterminacy and performance consequences.    
+
+总之，不要使用清除方法或在 Java 9 之前的终止方法，除非作为安全网或终止非关键的本地资源。即使这样，也要注意不确定性和性能带来的后果。
+
+
+
+<p id="Gamma95">[ThreadStop] Why Are Thread.stop, Thread.suspend, Thread.resume and Runtime.runFinalizersOnExit Deprecated? 1999. Sun Microsystems. https://docs.oracle.com/javase/8/docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html
+
+
+
+[Item9]: url	"在未来填入第 9 条的 url，否则无法进行跳转"
+[Item12]: url	"在未来填入第 12 条的 url，否则无法进行跳转"
+[Item24]: url	"在未来填入第 24 条的 url，否贼无法进行跳转"
+[chapter21]: url	"在未来填入第 21 章的 url，否则无法进行跳转"
+
+
+
+> 翻译：Injer
+>
+> 校对：Angus
