@@ -1,8 +1,8 @@
 ## 第 9 条：try-with-resources 优于 try-finally
 
-Java库包含许多必须通过调用 `close` 方法手动关闭的资源。包括 `InputStream`，`OutputStream`，和 `java.sql.Connection` 等。关闭资源常常被客户端所忽视，导致了可预见的糟糕性能影响 。虽然这其中许多资源使用了 finalizer 作为安全网，但 finalizer 并不能很好地工作（[第 8 条][item8]）。
+Java库中包含了许多必须通过调用 `close` 方法手动关闭的资源。包括 `InputStream`，`OutputStream`，和 `java.sql.Connection` 等。但关闭资源常常被客户端所忽视，导致了预料内的糟糕性能影响 。虽然这其中有许多资源使用了 finalizer 作为安全网，但 finalizer 并不能很好地工作（[第 8 条][item8]）。
 
-从以往看，try-finally 语句是保证资源被正确关闭的最佳方式 ，即使在遇到异常或返回时
+从以往看，try-finally 语句是保证资源被正确关闭的最佳方式 ，即使在遇到异常或返回时：
 
 ```java
 // try-finally - 不再是关闭资源的最佳方式!
@@ -39,11 +39,11 @@ static void copy(String src, String dst) throws IOException {
 }
 ```
 
-可能很难相信，即使是优秀的程序员，大多数时候也会在这上面犯错。一开始，在《Java解惑》（ Java Puzzlers [[Bloch05](#Bloch05)]）的第88页上我就将它弄错了，但多年来都没有人注意到。事实上，2007 年 Java 库中关于 `close` 方法的使用有三分之二是错的。
+可能很难相信，即使是优秀的程序员，大多数时候也会在这上面犯错。起初，我在《Java解惑》（ Java Puzzlers [[Bloch05](#Bloch05)]）的第88页上就将它弄错了，但多年来都没有人注意到。事实上，2007 年 Java 库中关于 `close` 方法的使用有三分之二是错的。
+[备注]: (//) 感觉这里应该是 2017 年。
 
-Under these circumstances, the second exception completely obliterates the first one. There is no record of the first exception in the exception stack trace, which can greatly complicate debugging in real systems—usually it’s the first exception that you want to see in order to diagnose the problem. While it is possible to write code to suppress the second exception in favor of the first, virtually no one did because it’s just too verbose.
 
-即使是使用 try-finally 语句关闭资源的正确代码，如前两个代码块所示，也有一个不易察觉的缺陷。try 语句块和 finally 语句块中的代码都能够抛出异常。例如，在 `firstLineOfFile` 方法中，对 `readLine` 方法的调用可能会因为底层物理设备的故障而抛出异常，对 `close` 方法的调用可能会因为同样的原因而失败。 在这种情况下，第二个例外完全抹杀了第一个例外。异常堆栈跟踪中没有第一个异常的记录，这可能会使实际系统中的调试变得非常复杂 - 通常这是您要查看以诊断问题的第一个异常。虽然有可能编写代码来抑制第二个异常而支持第一个异常，但几乎没有人这样做，因为它太冗长了。
+即使在使用 try-finally 语句关闭资源的正确代码中，如前两个代码块所示，也有一个不易察觉的缺陷。try 语句块和 finally 语句块中的代码都能够抛出异常。例如，在 `firstLineOfFile` 方法中，对 `readLine` 方法的调用可能会因为底层物理设备的故障而抛出异常，对 `close` 方法的调用可能会因为同样的原因而失败。 在这种情况下，第二个例外完全抹杀了第一个例外。异常堆栈跟踪中没有第一个异常的记录，这可能会使实际系统中的调试变得非常复杂 - 通常这是您要查看以诊断问题的第一个异常。虽然有可能编写代码来抑制第二个异常而支持第一个异常，但几乎没有人这样做，因为它太冗长了。
 
 All of these problems were solved in one fell swoop when Java 7 introduced the `try`-with-resources statement [JLS, 14.20.3]. To be usable with this construct, a resource must implement the `AutoCloseable` interface, which consists of a single `void`-returning `close`method. Many classes and interfaces in the Java libraries and in third-party libraries now implement or extend `AutoCloseable`. If you write a class that represents a resource that must be closed, your class should implement `AutoCloseable` too.
 
