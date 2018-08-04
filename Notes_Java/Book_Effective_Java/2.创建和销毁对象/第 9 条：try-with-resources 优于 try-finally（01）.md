@@ -1,15 +1,11 @@
 ## 第 9 条：try-with-resources 优于 try-finally
 
-The Java libraries include many resources that must be closed manually by invoking a close method. Examples include InputStream, OutputStream, and java.sql.Connection. Closing resources is often overlooked by clients, with predictably dire performance consequences. While many of these resources use finalizers as a safety net, finalizers don’t work very well (Item 8).    
+Java库包含许多必须通过调用 `close` 方法手动关闭的资源。包括 `InputStream`，`OutputStream`，和 `java.sql.Connection` 等。关闭资源常常被客户端所忽视，导致了可预见的糟糕性能影响 。虽然这其中许多资源使用了 finalizer 作为安全网，但 finalizer 并不能很好地工作（[第 8 条][item8]）。
 
-Java库包含许多必须通过调用`close`方法手动关闭的资源。实例包括`InputStream`，`OutputStream`，和`java.sql.Connection`。关闭资源经常被客户忽视，可预见的可怕性能后果。虽然其中许多资源使用终结器作为安全网，但终结器不能很好地工作（[第8项](https://www.safaribooksonline.com/library/view/effective-java-3rd/9780134686097/ch2.xhtml#lev8)）。
-
-Historically, a try-finally statement was the best way to guarantee that a resource would be closed properly, even in the face of an exception or return:    
-
-从历史上看，一`try`- `finally`声明是保证资源会被正常关闭，即使在异常或回报的脸的最佳方式：
+从以往看，try-finally 语句是保证资源被正确关闭的最佳方式 ，即使在遇到异常或返回时
 
 ```java
-// try-finally - No longer the best way to close resources!
+// try-finally - 不再是关闭资源的最佳方式!
 static String firstLineOfFile(String path) throws IOException {
     BufferedReader br = new BufferedReader(new FileReader(path));
     try {
@@ -20,12 +16,10 @@ static String firstLineOfFile(String path) throws IOException {
 }
 ```
 
-This may not look bad, but it gets worse when you add a second resource:    
-
-这可能看起来不错，但是当你添加第二个资源时它会变得更糟： 
+这看起来可能还不错，但当你添加第二个资源时，情况就慢慢变得糟糕起来： 
 
 ```java
-// try-finally is ugly when used with more than one resource!
+// 当使用多个资源时，try-finally 变得令人厌恶!
 static void copy(String src, String dst) throws IOException {
     InputStream in = new FileInputStream(src);
     try {
@@ -45,13 +39,11 @@ static void copy(String src, String dst) throws IOException {
 }
 ```
 
-It may be hard to believe, but even good programmers got this wrong most of the time. For starters, I got it wrong on page 88 of *Java Puzzlers* [[Bloch05](https://www.safaribooksonline.com/library/view/effective-java-3rd/9780134686097/ref.xhtml#rBloch05)], and no one noticed for years. In fact, two-thirds of the uses of the `close` method in the Java libraries were wrong in 2007.
+可能很难相信，即使是优秀的程序员，大多数时候也会在这上面犯错。一开始，在《Java解惑》（ Java Puzzlers [[Bloch05](#Bloch05)]）的第88页上我就将它弄错了，但多年来都没有人注意到。事实上，2007 年 Java 库中关于 `close` 方法的使用有三分之二是错的。
 
-可能很难相信，但即使是优秀的程序员也会在大多数时候弄错。对于初学者来说，我在*Java Puzzlers* [ [Bloch05](https://www.safaribooksonline.com/library/view/effective-java-3rd/9780134686097/ref.xhtml#rBloch05) ]的第88页上[弄错了](https://www.safaribooksonline.com/library/view/effective-java-3rd/9780134686097/ref.xhtml#rBloch05)，多年来没有人注意到。实际上，`close`2007年Java方法中该方法的三分之二使用是错误的。
+Under these circumstances, the second exception completely obliterates the first one. There is no record of the first exception in the exception stack trace, which can greatly complicate debugging in real systems—usually it’s the first exception that you want to see in order to diagnose the problem. While it is possible to write code to suppress the second exception in favor of the first, virtually no one did because it’s just too verbose.
 
-Even the correct code for closing resources with `try`-`finally` statements, as illustrated in the previous two code examples, has a subtle deficiency. The code in both the `try` block and the `finally` block is capable of throwing exceptions. For example, in the `firstLineOfFile` method, the call to `readLine` could throw an exception due to a failure in the underlying physical device, and the call to `close` could then fail for the same reason. Under these circumstances, the second exception completely obliterates the first one. There is no record of the first exception in the exception stack trace, which can greatly complicate debugging in real systems—usually it’s the first exception that you want to see in order to diagnose the problem. While it is possible to write code to suppress the second exception in favor of the first, virtually no one did because it’s just too verbose.
-
-即使是使用`try`- `finally`语句关闭资源的正确代码，如前两个代码示例所示，也有一个微妙的缺陷。`try`块和`finally`块中的代码都能够抛出异常。例如，在该`firstLineOfFile`方法中，`readLine`由于底层物理设备发生故障以及调用，调用可能会引发异常`close`然后可能因同样的原因而失败。在这种情况下，第二个例外完全抹杀了第一个例外。异常堆栈跟踪中没有第一个异常的记录，这可能会使实际系统中的调试变得非常复杂 - 通常这是您要查看以诊断问题的第一个异常。虽然有可能编写代码来抑制第二个异常而支持第一个异常，但几乎没有人这样做，因为它太冗长了。
+即使是使用 try-finally 语句关闭资源的正确代码，如前两个代码块所示，也有一个不易察觉的缺陷。try 语句块和 finally 语句块中的代码都能够抛出异常。例如，在 `firstLineOfFile` 方法中，对 `readLine` 方法的调用可能会因为底层物理设备的故障而抛出异常，对 `close` 方法的调用可能会因为同样的原因而失败。 在这种情况下，第二个例外完全抹杀了第一个例外。异常堆栈跟踪中没有第一个异常的记录，这可能会使实际系统中的调试变得非常复杂 - 通常这是您要查看以诊断问题的第一个异常。虽然有可能编写代码来抑制第二个异常而支持第一个异常，但几乎没有人这样做，因为它太冗长了。
 
 All of these problems were solved in one fell swoop when Java 7 introduced the `try`-with-resources statement [JLS, 14.20.3]. To be usable with this construct, a resource must implement the `AutoCloseable` interface, which consists of a single `void`-returning `close`method. Many classes and interfaces in the Java libraries and in third-party libraries now implement or extend `AutoCloseable`. If you write a class that represents a resource that must be closed, your class should implement `AutoCloseable` too.
 
@@ -119,3 +111,11 @@ static String firstLineOfFile(String path, String defaultVal) {
 The lesson is clear: Always use `try`-with-resources in preference to `try-finally` when working with resources that must be closed. The resulting code is shorter and clearer, and the exceptions that it generates are more useful. The `try-`with-resources statement makes it easy to write correct code using resources that must be closed, which was practically impossible using `try`-`finally`. 
 
 经验教训很明确：在使用必须关闭的资源时，始终`try`优先使用-with-resources `try-finally`。生成的代码更短更清晰，它生成的异常更有用。在`try-`与资源语句可以很容易地编写使用，必须关闭资源，这是几乎不可能使用正确的代码`try`- `finally`。 
+
+
+
+<p id="Bloch05">[Bloch05] Bloch, Joshua, and Neal Gafter. 2005. Java Puzzlers: Traps, Pitfalls, and Corner Cases. 
+Boston: Addison-Wesley.
+ISBN: 032133678X.
+
+[item8]: url	"在未来填入第 8 条的 url，否则无法进行跳转"
