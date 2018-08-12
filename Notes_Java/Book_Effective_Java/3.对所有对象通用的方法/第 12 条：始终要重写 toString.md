@@ -32,12 +32,12 @@ The disadvantage of specifying the format of the `toString` return value is that
   * "XXX-YYY-ZZZZ", where XXX is the area code, YYY is the
   * prefix, and ZZZZ is the line number. Each of the capital
   * letters represents a single decimal digit.
-  *
+    *
   * If any of the three parts of this phone number is too small
   * to fill up its field, the field is padded with leading zeros.
   * For example, if the value of the line number is 123, the last
   * four characters of the string representation will be "0123".
-  */
+    */
  @Override public String toString() {
      return String.format("%03d-%03d-%04d",
              areaCode, prefix, lineNum);
@@ -51,9 +51,9 @@ If you decide not to specify a format, the documentation comment should read som
   * Returns a brief description of this potion. The exact details
   * of the representation are unspecified and subject to change,
   * but the following may be regarded as typical:
-  *
+    *
   * "[Potion #9: type=love, smell=turpentine, look=india ink]"
-  */
+    */
  @Override public String toString() { ... }
 
 After reading this comment, programmers who produce code or persistent data that depends on the details of the format will have no one but themselves to blame when the format is changed.
