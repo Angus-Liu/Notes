@@ -24,3 +24,11 @@ git push
 pause
 ```
 
+
+
+
+
+### 常用命令：
+
++ 以图形化方式显示 log：`git log --graph`
+
