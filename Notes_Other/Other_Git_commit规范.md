@@ -10,8 +10,8 @@
 
 对格式的说明如下：
 
-- type代表某次提交的类型，比如是修复一个bug还是增加一个新的feature。所有的type类型如下：
-- feat： 新增feature
+- type 代表某次提交的类型，比如是修复一个bug还是增加一个新的feature。所有的type类型如下：
+- feat: 新增feature
 - fix: 修复bug
 - docs: 仅仅修改了文档，比如README, CHANGELOG, CONTRIBUTE等等
 - style: 仅仅修改了空格、格式缩进、都好等等，不改变代码逻辑
