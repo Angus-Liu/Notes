@@ -372,4 +372,4 @@ IDE 也有生成 equals 和 hashCode 方法的工具， 但是生成的结果代
 
 > 翻译：Inno
 >
-> 校对：
+> 校对：Angus
