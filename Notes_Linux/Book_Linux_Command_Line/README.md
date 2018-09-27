@@ -1,10 +1,10 @@
-## Linux Command Line and Shell Scripting Bible
+# Linux Command Line and Shell Scripting Bible
 
 > 记录学习**Linux**的历程，参考自书籍[《Linux Command Line and Shell Scripting Bible, 3E》](https://book.douban.com/subject/26854226/)。
 >
 > 下载链接：<http://readfree.me/book/26854226/>
 
-![17050121461316](assets/17050121461316.png) 
+![17050121461316](assets/17050121461316.png)
 
 ## 目录
 
@@ -28,4 +28,3 @@
 - [第18章_图形化桌面环境中的脚本编程](第18章_图形化桌面环境中的脚本编程.md)
 - [第19章_初始sed和gawk](第19章_初始sed和gawk.md)
 - [第20章_正则表达式](第20章_正则表达式.md)
-

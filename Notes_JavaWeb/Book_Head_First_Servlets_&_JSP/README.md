@@ -1,10 +1,10 @@
-## Head First Servlets & JSP 2nd Edition
+# Head First Servlets & JSP 2nd Edition
 
 > 回顾**Java EE基础知识**，参考自书籍[《Head First Servlets & JSP 2nd Edition（深入浅出Servlets和JSP 第二版）》](https://book.douban.com/subject/4604858/)，部分内容根据Java EE新规范进行了更新。
 >
 > 下载链接：<http://readfree.me/book/4604858/>
 
-![img](assets/s3267547.jpg) 
+![img](assets/s3267547.jpg)
 
 ## 目录
 
@@ -22,4 +22,3 @@
 + [第12章_要保密，要安全：Web应用安全](第12章_要保密，要安全：Web应用安全.md)
 + [第13章_过滤器的威力：过滤器和包装器](第13章_过滤器的威力：过滤器和包装器.md)
 + [第14章_企业设计模式：模式和struts](第14章_企业设计模式：模式和struts.md)
-
