@@ -22,6 +22,7 @@
 20. 删除整个错误 Ctrl + Backspace
 21. 添加依赖 File->Project Structrue->app->dependencies
 22. 删除行 Ctrl+Y 
+23. 查看文件结构 Ctrl + F12
 
 # IntelliJ IDEA 篇
 
@@ -180,5 +181,4 @@
 
 4. 列表增加/减少缩进    Ctrl + ] / Ctrl + [
 
-   
 
