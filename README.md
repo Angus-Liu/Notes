@@ -7,7 +7,6 @@
 
 + [**Algorithm**](Notes_Algorithm)
   + [Book_Algorithms](Notes_Algorithm/Book_Algorithms)
-  + [Training_LeetCode](Notes_AlgorithmTraining/Training_LeetCode)
   + [Training_剑指offer](Notes_AlgorithmTraining/Training_剑指offer)
 + [**Assembly**](Notes_Assembly)
   + [Book_汇编语言](Notes_Assembly/Book_汇编语言)
