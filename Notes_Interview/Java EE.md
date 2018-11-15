@@ -2,7 +2,7 @@
 
 ### JSP 隐式对象（9个）
 
-> [JSP内置对象 - CSDN博客](http://blog.csdn.net/qq_34337272/article/details/64310849)
+> [JSP内置对象](http://blog.csdn.net/qq_34337272/article/details/64310849)
 
 + out (JspWriter) : 输出服务器响应的输出流对象；
 + request (HttpServletRequest) : 封装客户端的请求，其中包含来自GET或POST请求的参数；
