@@ -97,6 +97,8 @@
 
 32. 调用处 Alt + F7、Ctrl + Alt + H、Ctrl + Alt + F7
 
+33. POM 文件添加依赖 Alt + Insert
+
 
 # Eclipse 篇
 
