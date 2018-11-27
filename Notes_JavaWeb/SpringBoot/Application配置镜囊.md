@@ -1,4 +1,4 @@
-## 默认激活的 profile
+## 默认激活的 Profile
 ```yml
 spring:
   profiles:
@@ -40,7 +40,7 @@ spring:
       cluster-nodes: 127.0.0.1:9300
 ```
 
-## 静态资源匹配
+## 静态资源访问
 
 ```yml
 spring:
@@ -52,7 +52,7 @@ spring:
     static-locations: classpath:/static/
 ```
 
-## Log 配置
+## Log 
 
 ```yml
 # log 配置
@@ -72,7 +72,7 @@ server:
       enabled: false
 ```
 
-## MySQL 配置
+## MySQL
 
 ```yml
 spring:
@@ -84,7 +84,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 ```
 
-## H2 配置
+## H2
 
 ```yml
 spring:
@@ -97,3 +97,4 @@ spring:
     data: classpath:db/data.sql
 ```
 
+l
