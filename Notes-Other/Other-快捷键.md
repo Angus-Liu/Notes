@@ -99,6 +99,8 @@
 
 33. POM 文件添加依赖 Alt + Insert
 
+34. 局部变量改成员变量 Ctrl+Alt+F
+
 
 # Eclipse 篇
 
@@ -173,7 +175,7 @@
 
 # Chrome 篇
 
-#  Typora
+#  Typora 篇
 
 1. 显示/隐藏侧边栏    Ctrl + Shift + L
 
