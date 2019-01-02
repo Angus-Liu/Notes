@@ -113,3 +113,11 @@ public int hashCode() {
 [Item83]: url	"在未来填入第 83 条的 url，否则无法进行跳转"
 [Guava]: https://github.com/google/guava	"Guava. 2017. Google Inc."
 
+
+
+---
+
+>翻译：Inger
+>
+>
+

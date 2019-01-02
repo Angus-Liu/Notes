@@ -163,7 +163,8 @@
 3. 切换任务+新建桌面    Win + TAB
 4. 软件跑到屏幕外    ALT＋TAB 后 ALT＋空格
 5. 窗口快捷操作  Alt + 空格 + 其他选项（最大化，最小化，还原。。。）
-6. Windows + num 打开任务栏对应软件
+6. 打开任务栏对应软件 Windows + num 
+7. 打开快捷搜索 Windows + Q/S
 
 # Linux 篇
 
