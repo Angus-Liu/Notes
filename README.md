@@ -1,5 +1,5 @@
-<div align="right">
-    <img src="assets/notes-logo.png" alt="my notes" href="https://github.com/Angus-Liu/Notes" width="300"/>
+<div>
+    <img src="assets/notes-logo.png" alt="my notes" href="https://github.com/Angus-Liu/Notes" width="300" align="right"/>
 </div>
 
 ​    
