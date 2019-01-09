@@ -1,4 +1,11 @@
-# 早点儿折腾，在最有承受能力的时候冲出去！
+<div algn="right">
+    <img src="assets/notes-logo.png" alt="my notes" href="https://github.com/Angus-Liu/Notes" width="300"/>
+</div>
+
+​    
+
+
+# 在最有承受能力的时候冲出去！
 
 >
 > Fear can hold you prisoner, hope can set you free.
