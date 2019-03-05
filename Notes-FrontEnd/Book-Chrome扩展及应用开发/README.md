@@ -1,6 +1,6 @@
 # Chrome 扩展及应用开发
 
-> 参考书籍[《Chrome 扩展及应用开发》](https://book.douban.com/subject/27086821/)，继续学习Java虚拟机方面知识。
+> 参考书籍[《Chrome 扩展及应用开发》](https://book.douban.com/subject/27086821/)，目的是为了开发一个小插件。（很有用的！！！）
 >
 > 下载链接：<http://www.ituring.com.cn/book/1421>
 
