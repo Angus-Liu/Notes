@@ -1,6 +1,8 @@
 # HTML5 与 CSS3 基础教程
 
-> 参考书籍[《HTML5 与 CSS3 基础教程》](https://book.douban.com/subject/25878992/)，补一补前端的基础，往全栈（干）工程师发展！😂 个人十分推荐这本书作为 HTML5 和 CSS3 的入门读物！
+> 参考书籍[《HTML5与CSS3 基础教程》](https://book.douban.com/subject/25878992/)，补一补前端的基础，往全干工程师发展！😂 
+>
+> 个人十分推荐这本书作为 HTML5 和 CSS3 的入门读物！真的！😎
 >
 > 下载链接：<https://readfree.me/book/25878992/>
 
