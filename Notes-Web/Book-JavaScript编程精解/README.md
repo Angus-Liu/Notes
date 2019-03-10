@@ -1,6 +1,8 @@
 # JavaScript 编程精解
 
-> 参考书籍[《Eloquent Javascript, 3rd Edition》](https://book.douban.com/subject/30275136/)，评分看着好高诶！
+> 参考书籍[《Eloquent Javascript, 3rd Edition》](https://book.douban.com/subject/30275136/)，评分好高！用来打基础吧💪
+>
+> 英文官方在线：<http://eloquentjavascript.net/>
 >
 > 中文非官版链接：<https://github.com/wizardforcel/eloquent-js-3e-zh>
 
@@ -8,8 +10,8 @@
 
 ## 目录 & 进度
 
-- [ ] 第1章 值，类型和运算符
-- [ ] 第2章 程序结构
+- [x] 第1章 值，类型和运算符
+- [x] 第2章 程序结构
 - [ ] 第3章 函数
 - [ ] 第4章 数据结构：对象和数组
 - [ ] 第5章 高阶函数
