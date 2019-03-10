@@ -7,6 +7,10 @@ cd /d E:\Data_Learning\Notes
 
 git status
 
+echo 按任意键继续
+
+pause
+
 echo 执行git命令：添加以N开头的文件或文件夹
 
 git add N* 
@@ -24,6 +28,18 @@ echo 执行git命令：push到仓库
 git push
 
 pause
+
+
+// ==============================
+cd /d D:\Data\Notes
+git status
+pause
+git add assets/
+git add N*
+git add LICENSE
+git add README.md
+git commit -m ":memo: Update notes at %Date:~0,4%/%Date:~5,2%/%Date:~8,2% %Time:~0,2%:%Time:~3,2%"
+git push
 ```
 
 
