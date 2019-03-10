@@ -5,6 +5,8 @@ echo 执行cd命令：进入本地指定仓库
 
 cd /d E:\Data_Learning\Notes
 
+git status
+
 echo 执行git命令：添加以N开头的文件或文件夹
 
 git add N* 
