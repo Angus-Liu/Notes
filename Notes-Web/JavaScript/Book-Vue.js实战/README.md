@@ -4,16 +4,16 @@
 >
 > 下载链接：<https://readfree.me/book/27178802>
 
-![Vue.js 实战](assets/s29587545.jpg)
+<img src="assets/s29587545.jpg" alt="Vue.js 实战" width="500"/>
 
 ## 目录 & 进度
 
 - [x] 第1章 初识Vue.js
 - [x] 第2章 数据绑定和第一个Vue应用
-- [ ] 第3章 计算属性
-- [ ] 第4章 v-bind及class与style绑定
-- [ ] 第5章 内置指令
-- [ ] 第6章 表单与v-model
+- [x] 第3章 计算属性
+- [x] 第4章 v-bind及class与style绑定
+- [x] 第5章 内置指令
+- [x] 第6章 表单与v-model
 - [ ] 第7章 组件详解
 - [ ] 第8章 自定义指令
 - [ ] 第9章 Render函数
@@ -26,3 +26,4 @@
 
 ## 读后感
 
+嗯，怎么抄官方文档？还好有一些实战小例子还算可以。
