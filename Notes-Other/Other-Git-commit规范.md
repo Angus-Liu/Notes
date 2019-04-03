@@ -4,7 +4,7 @@
 >
 > - [Commit message 和Change log 编写指南- 阮一峰的网络日志](http://www.ruanyifeng.com/blog/2016/01/commit_message_change_log.html)
 >
-> - [Git写出好的 commit message](https://ruby-china.org/topics/node11) 
+> - [Git写出好的 commit message](https://ruby-china.org/topics/15737) 
 
 ```properties
 <type>(<scope>): <subject>
