@@ -11,8 +11,8 @@
 - [x] 第01章 Netty——异步和事件驱动
 - [x] 第02章 你的第一款Netty应用程序
 - [x] 第03章 Netty的组件和设计
-- [ ] 第04章 传输
-- [ ] 第05章 ByteBuf
+- [x] 第04章 传输
+- [x] 第05章 ByteBuf
 - [ ] 第06章 ChannelHandler和ChannelPipeLine
 - [ ] 第07章 EventLoop和线程模型
 - [ ] 第08章 引导
