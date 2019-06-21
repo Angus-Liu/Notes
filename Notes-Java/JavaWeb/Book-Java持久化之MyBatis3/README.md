@@ -8,6 +8,6 @@
 
 - [x] 第1章 MyBatis 入门
 - [x] 第2章 引导MyBatis
-- [ ] 第3章 使用XML配置SQL映射器
-- [ ] 第4章 使用注解配置SQL映射器
-- [ ] 第5章 与Spring集成
+- [x] 第3章 使用XML配置SQL映射器
+- [x] 第4章 使用注解配置SQL映射器
+- [x] 第5章 与Spring集成
