@@ -19,7 +19,7 @@ static String firstLineOfFile(String path) throws IOException {
 这看起来可能还不错，但当你添加第二个资源时，情况就开始变得糟糕起来： 
 
 ```java
-// 当使用多个资源时，try-finally _就变得臃肿不堪！
+// 当使用多个资源时，try-finally 就变得臃肿不堪！
 static void copy(String src, String dst) throws IOException {
     InputStream in = new FileInputStream(src);
     try {
