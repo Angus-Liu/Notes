@@ -42,6 +42,40 @@ git commit -m ":memo: Update notes at %Date:~0,4%/%Date:~5,2%/%Date:~8,2% %Time:
 git push
 ```
 
+```shell
+#!/bin/bash
+
+echo "git pull"
+git pull
+
+echo "git status"
+git status
+
+get_char(){
+ SAVEDSTTY=`stty -g`
+ stty -echo
+ stty cbreak
+ dd if=/dev/tty bs=1 count=1 2> /dev/null
+ stty -raw
+ stty echo
+ stty $SAVEDSTTY
+}
+echo "Press any key to continue!"
+char=`get_char`
+
+echo "git add"
+git add assets/
+git add N*
+git add LICENSE
+git add README.md
+
+echo "git commit -m :memo: Update notes at `date '+%Y/%m/%d %H:%M'`"
+git commit -m ":memo: Update notes at `date '+%Y/%m/%d %H:%M'`"
+
+echo "git push"
+git push
+```
+
 
 
 
