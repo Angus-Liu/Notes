@@ -32,6 +32,7 @@ pause
 
 // ==============================
 cd /d D:\Data\Notes
+git pull
 git status
 pause
 git add assets/
