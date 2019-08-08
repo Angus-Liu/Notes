@@ -5,9 +5,9 @@
 
 ![Kotlin in Action](assets/s29499733.jpg)
 
-- [ ] 1 Kotlin：定义和目的
-- [ ] 2 Kotlin 基础
-- [ ] 3 函数的定义和使用
+- [x] 1 Kotlin：定义和目的
+- [x] 2 Kotlin 基础
+- [x] 3 函数的定义和使用
 - [ ] 4 类、对象和接口
 - [ ] 5 Lambda 编程
 - [ ] 6 Kotlin 的类型系统
