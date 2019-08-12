@@ -49,21 +49,20 @@ public annotation class Metadata(
     @get:JvmName("xs")
     val extraString: String = "",
     /**
-     * Fully qualified name of the package this class is located in, from Kotlin's point of view, or empty string if this name
-     * does not differ from the JVM's package FQ name. These names can be different in case the [JvmPackageName] annotation is used.
-     * Note that this information is also stored in the corresponding module's `.kotlin_module` file.
+     * 从Kotlin的角度来看，该类所在的包的完全限定名，如果这个名称与JVM的包FQ名称没有区别，则为空字符串。
+     * 如果使用JvmPackageName注解，这些名称可能不同。
+     * 请注意，此信息也存储在相应模块的.kotlin_module文件中。
      */
     @SinceKotlin("1.2")
     @get:JvmName("pn")
     val packageName: String = "",
     /**
-     * An extra int. Bits of this number represent the following flags:
+     * 额外的int。这个数字的位代表以下标志：
      *
-     * * 0 - this is a multi-file class facade or part, compiled with `-Xmultifile-parts-inherit`.
-     * * 1 - this class file is compiled by a pre-release version of Kotlin and is not visible to release versions.
-     * * 2 - this class file is a compiled Kotlin script source file (.kts).
-     * * 3 - the metadata of this class file is not supposed to be read by the compiler, whose major.minor version is less than
-     *   the major.minor version of this metadata ([mv]).
+     * 0 - 这是一个多文件类外观或部分，使用-Xmultifile-parts-inherit编译。
+     * 1 - 这个类文件由Kotlin的预发行版本编译，发行版本不可见。
+     * 2 - 这个类文件是一个编译好的Kotlin脚本源文件(.kts)。
+     * 3 - 此类文件的元数据不应由编译器读取，编译器的major.minor版本小于此元数据的主要版本（mv）。
      */
     @SinceKotlin("1.1")
     @get:JvmName("xi")
