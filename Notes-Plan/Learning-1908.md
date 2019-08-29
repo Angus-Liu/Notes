@@ -21,7 +21,7 @@
 - [ ] **JavaWeb：** 《SpringBoot 实战》
 - [ ] **JavaScript：** 《ECMAScript 6 入门》
 - [ ] **JavaScript：** 《深入理解ES6》
-- [ ] **Kotlin：** 《Kotlin in Action》
+- [x] **Kotlin：** 《Kotlin in Action》
 - [ ] **Operating System：** 《现代计算机系统》
 - [ ] **Redis：** 《Redis 的设计与实现》
 - [ ] **OpenResty：** 《OpenResty 实战》
@@ -30,10 +30,11 @@
 
 - [ ] **Web：** 打造仿猫眼项目 以 Dubbo 为核心解锁微服务
 - [ ] **CS：** MIT SICP
+- [ ] **Java：** 《Java高并发秒杀API》
 
 #### ▶ 待做作业
 
-- [ ] **开发软件：** 使用flutter开发，一键设置手机各种开关，音量，屏幕亮度。设置基本的：会议模式，工作模式，打盹模式，睡眠模式，学习模式等
+- [ ] **开发软件：** 使用flutter开发，一键设置手机各种开关，音量，屏幕亮度。设置基本的：会议模式，工作模式，打盹模式，睡眠模式，学习模式等（APP：打个盹）
 - [ ] **书籍翻译：** 开始翻译《Effective Java (3rd Edition)》（进行中...）
 - [ ] **源码分析：** 翻译开发文档，记录成博客或日志
 - [ ] **知识总结：** MTBOX（月光宝盒）撰写中
@@ -41,8 +42,7 @@
 - [ ] **开源工具：** 总结 Better MaBatis & Better Spring
 - [ ] **开源工具：** 模仿取消空指针的做法，写一个方便的强转工具
 - [ ] **开源工具：** 开发一个更好的 GitHub star 项目分类管理插件
-
-  - guitar，吉他，其管理信息就保存在使用者的某个仓库或是代码片段中
+- guitar，吉他，其管理信息就保存在使用者的某个仓库或是代码片段中
   - 提供基于 Google 账号的同步和基于 Github gitst/repository 的同步设置
   - 模仿 Repository 加 topic 的方式
   - ~~存储采用 Web SQL Database（暂定）~~
@@ -66,6 +66,7 @@
   - <https://github.com/Wscats/github-emoji>
   - <https://github.com/shershen08/emoji-vue> 很像
   - <https://github.com/DCzajkowski/vue-emoji-picker> 值得参考
+  - github个人账户的status
 - [ ] **博客更新：** 使用 VuePress（拟定） 搭建个人博客（评论插件使用 Comment.JS、GitTalk）
 - [ ] **项目实践：** 图书下载，资源聚合小程序 
 
