@@ -8,7 +8,7 @@
 - [ ] **Computer Network：** 《计算机网络：自顶向下法》
 - [ ] **DataBase：** 《高性能 MySQL》
 - [ ] **Deep Learning：** 《深度学习入门：基于Python的理论与实现》
-- [ ] **English：** 《赖世雄经典语法》
+- [ ] ~~**English：** 《赖世雄经典语法》~~
 - [ ] **Java：** 《代码整洁之道》
 - [ ] **Java：** 《重构：改善既有代码的设计》
 - [ ] **Java：** 《揭秘 Java 虚拟机》
@@ -19,11 +19,12 @@
 - [ ] **JavaWeb：** 《MyBatis 技术内幕》
 - [ ] **JavaWeb：** 《Java持久化之MyBatis3》
 - [ ] **JavaWeb：** 《SpringBoot 实战》
-- [ ] **JavaScript：** 《ECMAScript 6 入门》
-- [ ] **JavaScript：** 《深入理解ES6》
+- [ ] ~~**JavaScript：** 《ECMAScript 6 入门》~~
+- [ ] ~~**JavaScript：** 《深入理解ES6》~~
 - [ ] **Operating System：** 《现代计算机系统》
 - [ ] **Redis：** 《Redis 的设计与实现》
-- [ ] **OpenResty：** 《OpenResty 实战》
+- [x] **OpenResty：** 《OpenResty 实战》
+- [ ] **Software Engineering：** 《持续交互（发布可靠软件的系统方法）》
 
 #### ▶ 待学课程
 
