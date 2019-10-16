@@ -2,6 +2,7 @@
 
 > 因项目需要，学习 Kotlin，参考自书籍[《Kotlin 实战》](https://book.douban.com/subject/27093660/)。
 >
+> Kotlin 真香🍗
 
 ![Kotlin in Action](assets/s29499733.jpg)
 
