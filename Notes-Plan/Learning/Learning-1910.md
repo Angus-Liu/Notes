@@ -20,13 +20,12 @@
 - [ ] **JavaWeb：** 《SpringBoot 实战》
 - [ ] **Operating System：** 《现代计算机系统》
 - [ ] **Redis：** 《Redis 的设计与实现》
-- [ ] **Software Engineering：** 《持续交互（发布可靠软件的系统方法）》
+- [x] **Software Engineering：** 《持续交互（发布可靠软件的系统方法）》
 
 #### ▶ 待学课程
 
 - [ ] **Web：** 打造仿猫眼项目 以 Dubbo 为核心解锁微服务
 - [ ] **CS：** MIT SICP
-- [x] **Java：** 《Java高并发秒杀API》
 - [ ] **Go：** 《Go语言语法入门篇》
 
 #### ▶ 待做作业
