@@ -1,6 +1,6 @@
 ## High Performance MySQL
 
-> 记录学习**MySQL数据库优化**的历程，参考自书籍[《High Performance MySQL,3rd （高性能MySQL，第三版）》](https://book.douban.com/subject/23008813/)。
+> 记录学习**MySQL**的历程，参考自书籍[《High Performance MySQL,3rd （高性能MySQL，第三版）》](https://book.douban.com/subject/23008813/)。
 >
 > 下载链接：<http://readfree.me/book/23008813/>
 
