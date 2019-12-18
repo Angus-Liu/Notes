@@ -1,9 +1,10 @@
-# 404！
+表锁是MySQL最基本的锁策略，并且是开销最小的策略。
 
-> 你到了知识的荒原 : )
->
-> You are in the wasteland of knowledge.
+写锁币比读锁优先级高，一个写锁请求可以插入到读锁前面。
 
-I'm so sorry, because I didn't write anything.
+ACID：原子性、一致性、隔离性、持久性
 
-![404](assets/404.jpg)  
+MVCC：多版本并发控制，通过在每行记录后面保存两个隐藏的列实现，分别保存行的创建和过期时间（系统版本号）
+
+
+
