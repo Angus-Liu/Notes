@@ -1,24 +1,3 @@
-#### ▶ 待看书籍
-
-- [ ] **Algorithm：** 《Algorithms》
-- [ ] **Computer Science：** 《计算机程序的构造和解释》
-- [ ] **Computer Science：** 《The Art of Computer Programming》
-- [ ] **Computer Science：** 《编译原理》
-- [ ] **Computer Network：** 《HTTP 权威指南》
-- [ ] **Computer Network：** 《计算机网络：自顶向下法》
-- [ ] **DataBase：** 《高性能 MySQL》
-- [ ] **Deep Learning：** 《深度学习入门：基于Python的理论与实现》
-- [ ] **Java：** 《代码整洁之道》
-- [ ] **Java：** 《揭秘 Java 虚拟机》
-- [ ] **Java：** 《Java 程序性能优化》
-- [ ] **Java：** 《Java 性能优化权威指南》
-- [ ] **Java：** 《Java 并发编程实战》
-- [ ] **JavaWeb：** 《Spring 揭秘》
-- [ ] **JavaWeb：** 《MyBatis 技术内幕》
-- [ ] **JavaWeb：** 《Java持久化之MyBatis3》
-- [ ] **Operating System：** 《现代计算机系统》
-- [ ] **Redis：** 《Redis 的设计与实现》
-
 #### ▶ 待学课程
 
 - [ ] **CS：** MIT SICP
