@@ -170,12 +170,6 @@
 
 1. 清空命令 Ctrl + L
 
-# WizNote 篇
-
-1. 获取文字格式化    选中文字 + Ctrl + Shift + F
-
-# Chrome 篇
-
 #  Typora 篇
 
 1. 显示/隐藏侧边栏    Ctrl + Shift + L
@@ -185,5 +179,4 @@
 3. 应用内窗口切换    Ctrl + Tab
 
 4. 列表增加/减少缩进    Ctrl + ] / Ctrl + [
-
 
